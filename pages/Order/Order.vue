@@ -1,13 +1,13 @@
 <template>
 	<view class="order-box">
 		<movable-area class="movable-box">
-			<movable-view class="search-btn" :x="x" :y="y" direction="all" @change="onChange" inertia @click="showSearch = true">
+			<!-- <movable-view class="search-btn" :x="x" :y="y" direction="all" @change="onChange" inertia @click="showSearch = true">
 				<u-icon name="search" size="40rpx"></u-icon>
-			</movable-view>
-			<scroll-view scroll-y style="height: 100%;width: 100%;" @scrolltolower="onreachBottom"><order-list ref="OrderList" v-if="current === 0" /></scroll-view>
+			</movable-view> -->
+			<scroll-view scroll-y style="height: 100vh;width: 100%;" @scrolltolower="onreachBottom"><order-list ref="OrderList" :order-list="orderList" /></scroll-view>
 		</movable-area>
 		<!-- search -->
-		<u-popup v-model="showSearch" width="80%" border-radius="20">
+		<!-- <u-popup v-model="showSearch" width="80%" border-radius="20">
 			<view class="search-box">
 				<view class="search-title">搜索</view>
 				<u-form :model="searchData" label-width="160" ref="searchRef">
@@ -24,7 +24,7 @@
 				</u-form>
 				<u-button type="primary" @click="searchPage">搜索</u-button>
 			</view>
-		</u-popup>
+		</u-popup> -->
 		<u-top-tips ref="uTips" />
 	</view>
 </template>
@@ -55,17 +55,7 @@ export default {
 				x: 0,
 				y: 0
 			},
-			list: [
-				{
-					name: ' 订单列表 '
-				},
-				{
-					name: ' 订单统计 '
-				}
-			],
-			// 因为内部的滑动机制限制，请将tabs组件和swiper组件的current用不同变量赋值
-			current: 0, // tabs组件的current值，表示当前活动的tab选项
-			swiperCurrent: 0 // swiper组件的current值，表示当前那个swiper-item是活动的
+			orderList: []
 		};
 	},
 	mounted() {
@@ -85,7 +75,10 @@ export default {
 					this.searchData.orderStatus = 0;
 					const { data, code, total } = res.data;
 					if (code === '200') {
-						if (data.length <= 0) {
+						if (!data || data.length <= 0) {
+							if(this.page.pageNum == 1){
+								this.orderList = []
+							}
 							this.$refs.uTips.show({
 								title: '已加载全部',
 								type: 'warning'
@@ -93,12 +86,14 @@ export default {
 							return false;
 						}
 						this.orderList = this.orderList.concat(data);
-						this.page.pageNum = total;
+						this.page.total = total;
+						this.page.pageNum += 1;
 					}
 				});
 		},
 		searchPage() {
 			this.showSearch = false;
+			this.page.pageNum = 1;
 			this.getOrder();
 		},
 		onChange: function(e) {
@@ -107,25 +102,8 @@ export default {
 		},
 		// scroll-view到底部加载更多
 		onreachBottom() {
-			this.current === 0 && this.getOrder();
+			this.getOrder();
 		},
-		// tabs通知swiper切换
-		tabsChange(index) {
-			this.swiperCurrent = index;
-		},
-		// swiper-item左右移动，通知tabs的滑块跟随移动
-		transition(e) {
-			let dx = e.detail.dx;
-			this.$refs.uTabs.setDx(dx);
-		},
-		// 由于swiper的内部机制问题，快速切换swiper不会触发dx的连续变化，需要在结束时重置状态
-		// swiper滑动结束，分别设置tabs和swiper的状态
-		animationfinish(e) {
-			let current = e.detail.current;
-			this.$refs.uTabs.setFinishCurrent(current);
-			this.swiperCurrent = current;
-			this.current = current;
-		}
 	},
 	onPullDownRefresh() {
 		this.getOrder();

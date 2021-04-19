@@ -1,4 +1,5 @@
 <script>
+	import {mapActions} from 'vuex'
 	export default {
 		onLaunch: function() {
 			console.log('App Launch')
@@ -9,6 +10,17 @@
 				primaryDisabled: "#d99465",
 				primaryLight: "#f4a16a"
 			}
+			const token = uni.getStorageSync('token')
+			token && this.$u.api.getMember().then(res => {
+				if(res.data.code === '200'){
+					uni.setStorageSync('userInfo', res.data.data)
+					this.setUserInfoAction(res.data.data)
+					console.log(this)
+				}
+			})
+		},
+		methods:{
+			...mapActions(['setUserInfoAction'])
 		},
 		onShow: function() {
 			console.log('App Show')

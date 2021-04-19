@@ -1,6 +1,7 @@
 import {
 	BASE_URL
 } from "@/Api/BASE_API.js"
+import {goLogin} from '../utils/index.js'
 
 // 这里的vm，就是我们在vue文件里面的this，所以我们能在这里获取vuex的变量，比如存放在里面的token变量
 const install = (Vue, vm) => {
@@ -28,7 +29,7 @@ const install = (Vue, vm) => {
 
 		// 方式四，如果token放在了Storage本地存储中，拦截是每次请求都执行的
 		// 所以哪怕您重新登录修改了Storage，下一次的请求将会是最新值
-		const token = uni.getStorageSync('token') || undefined;
+		const token = uni.getStorageSync('token') || '';
 		config.header.Authorization = token;
 		// config.header.Token = token;
 
@@ -47,10 +48,9 @@ const install = (Vue, vm) => {
 				title: `登录失效`,
 				content: `登录失效，请重新登录`,
 				showCancel: false,
-				success: () => {
-					vm.$u.route({
-						url: `/pages/Login/Login`
-					})
+				success: (result) => {
+					uni.removeStorageSync('token')
+					result.confirm && goLogin()
 				}
 			})
 

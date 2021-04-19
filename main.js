@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from './App'
+import store from 'store/index.js'
 
 import ShopTitle from '@/components/ShopTitle/ShopTitle'
 
@@ -12,13 +13,15 @@ import httpApi from '@/Api/http.api.js'
 
 Vue.component('shop-title', ShopTitle)
 Vue.use(uView);
+Vue.prototype.$store = store
 
 Vue.config.productionTip = false
 
 App.mpType = 'app'
 
 const app = new Vue({
-    ...App
+	store,
+	...App
 })
 
 Vue.use(httpInterceprot, app)

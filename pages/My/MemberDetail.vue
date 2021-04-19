@@ -1,17 +1,14 @@
 <template>
 	<view class="shop-detail">
 		<u-form :form="form" label-width="180">
-			<u-form-item label="商铺名称"><u-input v-model="form.shopName" placeholder="请输入商铺名称"></u-input></u-form-item>
-			<u-form-item label="商铺LOGO">
-				<u-upload :action="action" :file-list="fileList" max-count="1" :multiple="false" @on-error="changeImgErr" @on-success="changeImgSuccess" :header="header"></u-upload>
+			<u-form-item label="用户名"><u-input v-model="form.nickName" placeholder="请输入用户名"></u-input></u-form-item>
+			<u-form-item label="头像">
+				<u-upload :action="action" :file-list="fileList" max-count="1" :multiple="false" @on-error="changeImgErr" @on-success="changeImgSuccess" @on-remove="removeImg" :header="header"></u-upload>
 			</u-form-item>
-			<u-form-item label="商铺电话"><u-input v-model="form.shopTel" placeholder="请输入商铺电话"></u-input></u-form-item>
-			<u-form-item label="商铺地址"><u-input v-model="form.shopAddress" placeholder="请输入商铺地址"></u-input></u-form-item>
-			<u-form-item label="商铺营业时间"><u-input v-model="form.businessHour" placeholder="请输入商铺营业时间"></u-input></u-form-item>
-			<u-form-item label="商铺商铺描述"><u-input v-model="form.shopDetail" placeholder="请输入商铺商铺描述"></u-input></u-form-item>
+			<!-- <u-form-item label="真实姓名"><u-input v-model="form.realName" placeholder="请输入真实姓名"></u-input></u-form-item> -->
 		</u-form>
 		<view class="save-btn">
-			<u-button type="primary" @click="saveShopDetail()">提交商铺信息</u-button>
+			<u-button type="primary" @click="saveShopDetail()">提交信息</u-button>
 		</view>
 
 		<u-top-tips ref="uTips" />
@@ -25,13 +22,9 @@ export default {
 		return {
 			BASE_URL,
 			form: {
-				businessHour: '',
-				shopAddress: '',
-				shopDetail: '',
-				shopId: '',
-				shopLogo: '',
-				shopName: '',
-				shopTel: ''
+				nickName: '',
+				// realName: '',
+				avatarUrl: '',
 			},
 			// 演示地址，请勿直接使用
 			action: BASE_URL + '/api/file/upload',
@@ -46,22 +39,28 @@ export default {
 	},
 	methods: {
 		getShopDetail() {
-			this.$u.api.getShop().then(res => {
-				Object(this.form).keys().map(v => {
+			this.$u.api.getMember().then(res => {
+				Object.keys(this.form).map(v => {
 					this.form[v] = res.data.data[v]
 				})
-				this.fileList = [{url: res.data.data.shopLogo}]
+				this.fileList = res.data.data.avatarUrl && [{url: `${BASE_URL}/files/${res.data.data.avatarUrl}`}]
 			});
 		},
 		saveShopDetail() {
-			this.$u.api.saveShop(this.form).then(res => {
+			this.$u.api.updateMember({
+				...this.form,
+				tenantMemberId: uni.getStorageSync('userInfo').tenantMemberId
+			}).then(res => {
 				if (res.data.code === '200') {
 					this.$refs.uTips.show({
 						title: '保存成功',
 						type: 'primary'
 					});
 					setTimeout(() => {
-						this.$u.route(`/pages/My/My`);
+						this.$u.route({
+							type: 'reLaunch',
+							url: '/pages/My/My'
+						});
 					}, 1500);
 				}
 			});
@@ -95,8 +94,17 @@ export default {
 		 */
 		changeImgSuccess(data, index, lists, name) {
 			if (data.code === '200') {
-				this.form.shopLogo = data.data;
+				this.form.avatarUrl = data.data;
 			}
+		},
+		/**
+		 * @param {Object} index
+		 * @param {Object} lists
+		 * @param {Object} name
+		 */
+		removeImg(index, lists, name){
+			console.log(index, lists, name)
+			this.form.avatarUrl = ''
 		}
 	}
 };
