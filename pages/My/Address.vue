@@ -130,12 +130,12 @@ export default {
 	display: flex;
 	justify-content: space-around;
 	width: 600rpx;
-	line-height: 100rpx;
-	position: absolute;
+	line-height: 80rpx;
+	position: fixed;
 	bottom: 30rpx;
 	left: 80rpx;
-	background-color: red;
-	border-radius: 60rpx;
+	background-color: $u-type-primary;
+	border-radius: 10rpx;
 	font-size: 30rpx;
 	.add {
 		display: flex;

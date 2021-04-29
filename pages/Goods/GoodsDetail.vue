@@ -8,7 +8,10 @@
 		</view>
 		<view class="shop-item">
 			<u-icon name="rmb-circle" size="36rpx" />
-			<text class="item-name">{{ detail.productPrice }}</text>
+			<text class="item-name">
+			￥ {{Number(detail.productPrice).toFixed(2)}}
+			<text class="origin-txt"> ￥{{Number(detail.originalPrice).toFixed(2)}}</text>
+			</text>
 		</view>
 		<view class="shop-item">
 			<u-icon name="tags" size="36rpx"></u-icon>
@@ -143,19 +146,32 @@
 		</u-popup>
 		<u-popup v-model="showShare" mode="bottom">
 			<view class="share-box">
-				<u-button type="primary" open-type="share">分享好友</u-button>
+				<u-button type="default" open-type="share">
+					<u-icon name="chat" size="100" color="#00aa00" />
+					<view>分享好友</view>
+				</u-button>
 				<u-button
-					type="primary"
+					type="default"
 					@click="
 						showShare = false;
 						showShareBanner = true;
 					"
 				>
-					生成海报
+					<u-icon name="photo" size="100" color="#ff5500" />
+					<view>生成海报</view>
 				</u-button>
 			</view>
 		</u-popup>
-		<ShareGoods v-if="showShareBanner" @cancel="() => (showShare = false)" :goods-detail="detail"></ShareGoods>
+		<ShareGoods
+			v-if="showShareBanner"
+			@cancel="
+				() => {
+					showShare = false;
+					showShareBanner = false;
+				}
+			"
+			:goods-detail="detail"
+		></ShareGoods>
 		<u-top-tips ref="uTips" />
 	</view>
 </template>
@@ -290,8 +306,8 @@ export default {
 				this.$refs.payRef.clearLoading();
 				return false;
 			}
-			const data = this.$u.deepClone(this.detail)
-			data.productNumber = 1
+			const data = this.$u.deepClone(this.detail);
+			data.productNumber = 1;
 			this.$u.api
 				.generateOrder({
 					productList: [data],
@@ -300,9 +316,15 @@ export default {
 					orderPrice: (data && data.productPrice * this.productNumber) || 0
 				})
 				.then(res => {
-					this.$u.route({
-						url: `/pages/Order/Order`
-					});
+					this.showCar = false;
+					this.showPay = false;
+					const { data, code } = res.data;
+					console.log('erer', res.data);
+					if (code === '200') {
+						this.$u.route({
+							url: `/pages/Pay/Pay?orderId=${data}`
+						});
+					}
 				})
 				.catch(() => {
 					this.$refs.uTips.show({
@@ -342,6 +364,13 @@ export default {
 		}
 		.item-name {
 			margin-left: 20rpx;
+			color: red;
+			.origin-txt{
+				color: #999;
+				font-style: oblique;
+				text-decoration: line-through;
+				margin-left: 20rpx;
+			}
 		}
 	}
 	.navigation {
@@ -437,10 +466,20 @@ export default {
 	}
 	.share-box {
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
+		justify-content: space-around;
 		padding: 40rpx 40rpx 0;
 		.u-btn {
+			width: 100%;
+			height: auto;
+			display: flex;
+			flex-direction: column;
+			flex-grow: 1;
 			margin-bottom: 40rpx;
+			border-width: 0;
+			&::after {
+				border: none;
+			}
 		}
 	}
 }

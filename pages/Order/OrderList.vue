@@ -9,7 +9,7 @@
 			</view>
 			<view class="goods-list">
 				<view class="goods-item" v-for="(goods, index) in item.orderDetailListOutDTOList" :key="index">
-					<view class="order-img"><u-image :src="BASE_URL + '/files/'+ goods.productCover" width="100%" height="100rpx"></u-image></view>
+					<view class="order-img"><u-image :src="BASE_URL + '/files/' + goods.productCover" width="100%" height="100rpx"></u-image></view>
 					<view class="order-detail">
 						<view class="detail-txt">商品名称：{{ goods.productName }}</view>
 						<view class="detail-txt">商品数量：{{ goods.productNumber }}</view>
@@ -17,7 +17,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="all-price">共{{ item.orderDetailListOutDTOList.length }}件，总价格：{{ addPrice(item) }}元</view>
+			<view class="all-price">共{{ item.buyCount }}件，总价格：{{ item.orderPrice }}元</view>
 			<view class="order-addrenss">
 				<u-icon name="map"></u-icon>
 				<view class="address-txt">{{ item.buyerAddress }}</view>
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-	import {BASE_URL} from '../../Api/BASE_API.js'
+import { BASE_URL } from '../../Api/BASE_API.js';
 export default {
 	props: {
 		orderList: Array
@@ -51,23 +51,26 @@ export default {
 	mounted() {},
 	methods: {
 		pushGoods(item) {
-			this.$u.api
-				.sendProduct({
-					orderId: item.orderId
-				})
-				.then(res => {
-					if (res.data.code === '200') {
-						this.$refs.uTips.show({
-							title: '发货成功',
-							type: 'primary'
-						});
-					} else {
-						this.$refs.uTips.show({
-							title: res.data.msg,
-							type: 'error'
-						});
-					}
-				});
+			uni.navigateTo({
+				url: `/pages/Pay/Pay?orderId=${item.orderId}`
+			});
+			// this.$u.api
+			// 	.sendProduct({
+			// 		orderId: item.orderId
+			// 	})
+			// 	.then(res => {
+			// 		if (res.data.code === '200') {
+			// 			this.$refs.uTips.show({
+			// 				title: '发货成功',
+			// 				type: 'primary'
+			// 			});
+			// 		} else {
+			// 			this.$refs.uTips.show({
+			// 				title: res.data.msg,
+			// 				type: 'error'
+			// 			});
+			// 		}
+			// 	});
 		},
 		// 总价格
 		addPrice(item) {
@@ -87,7 +90,7 @@ export default {
 		background-color: #fff;
 		margin: 20rpx;
 		padding: 20rpx;
-		box-shadow:0rpx 3rpx 12rpx 3rpx rgba(0, 0, 0, 0.1);
+		box-shadow: 0rpx 3rpx 12rpx 3rpx rgba(0, 0, 0, 0.1);
 		border-radius: 10rpx;
 		.order-content {
 			margin-bottom: 20rpx;

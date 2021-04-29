@@ -101,6 +101,15 @@
             }
             
         }
+        ,{
+            "path" : "pages/Pay/Pay",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "支付订单",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

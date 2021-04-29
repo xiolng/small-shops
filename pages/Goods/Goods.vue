@@ -46,6 +46,10 @@
 										<view class="item-menu-info u-line-2">{{ item1.productIntro }}</view>
 										<view class="price-box">
 											<view class="price-txt">
+											<view class="price-origin">
+												<text class="red">￥</text>
+												<text class="txt">{{ item1.originalPrice.toFixed(2) }}</text>
+											</view>
 												<text class="red">￥</text>
 												<text class="txt">{{ item1.productPrice.toFixed(2) }}</text>
 											</view>
@@ -284,6 +288,15 @@ export default {
 				}
 				.txt {
 					font-size: 30rpx;
+				}
+				.price-origin{
+					color: #999;
+					text-decoration: line-through;
+					font-style: oblique;
+					font-size: 18rpx;
+					.txt{
+						font-size: 24rpx;
+					}
 				}
 			}
 			.price-btn {

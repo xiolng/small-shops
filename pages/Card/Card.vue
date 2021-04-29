@@ -20,7 +20,7 @@
 								<view class="" v-show="item.productIntro"><u-tag :text="item.productIntro" mode="light" size="mini" type="info" /></view>
 								<u-row class="cart-footer">
 									<u-col span="6">
-										<text class="price">{{ item.productPrice }}￥</text>
+										<text class="price">￥{{ item.productPrice }}</text>
 									</u-col>
 									<u-col span="6" class="number-box">
 										<u-number-box v-model="item.productNumber" @change="valChange" :index="index" :min="1" :max="100" :color="numColor"></u-number-box>
@@ -31,28 +31,24 @@
 					</u-row>
 				</view>
 			</u-checkbox-group>
-			<view v-if='!cartList.length || !isLogin()'>
-				<u-empty mode='car'></u-empty>
-			</view>
+			<view v-if="!cartList.length || !isLogin()"><u-empty mode="car"></u-empty></view>
 		</view>
 
 		<!-- 底部框 -->
 		<u-row gutter="4" class="cart-footer-tool" align-items="center">
-			<u-col span="5">
-				<u-row class="u-row">
-					<u-col class="u-col" span="6"><u-checkbox v-model="checked" shape="circle" @change="checkAll">全选</u-checkbox></u-col>
-					<u-col class="u-col" span="6">
-						<view v-if="checked && cartList.length" style="display: inline;"><u-button @click="clearCard" type="error" size="mini">清空购物车</u-button></view>
-					</u-col>
-				</u-row>
+			<u-col span="4">
+				<view style="align-self: center; min-height: 76rpx; display: flex; align-items: center; margin-left: 10rpx;">
+					<u-checkbox v-model="checked" shape="circle" @change="checkAll">全选</u-checkbox>
+					<view v-if="checked && cartList.length" style="display: inline;"><u-button @click="clearCard" type="error" size="mini">清空</u-button></view>
+				</view>
 			</u-col>
-			<u-col span="7">
-				<view class="" style="text-align: right;">
+			<u-col span="8">
+				<view class="" style="text-align: right; display: flex; align-items: center; justify-content: flex-end; margin-right: 10rpx;">
 					<text>
 						合计:
 						<text>￥{{ allPrice.toFixed(2) }}</text>
 					</text>
-					<u-button type="error" size="medium" style="margin:0 30rpx;" @click="showPay = true" :disabled="!activeArr || !cartList.length">结算</u-button>
+					<u-button type="error" size="medium" style="margin:0 0 0 20rpx;" @click="showPay = true" :disabled="!activeArr || !cartList.length">结算</u-button>
 				</view>
 			</u-col>
 		</u-row>
@@ -109,7 +105,7 @@
 
 <script>
 import { BASE_URL } from '../../Api/BASE_API.js';
-import {isLogin} from '../../utils/index.js'
+import { isLogin } from '../../utils/index.js';
 export default {
 	data() {
 		return {
@@ -141,38 +137,39 @@ export default {
 	},
 	mounted() {
 		console.log(this.$u.color);
-		this.getCard();
-		this.getData()
+		const token = uni.getStorageSync('token');
+		token && this.getCard();
+		token && this.getData();
 	},
 	onShow() {
-		this.getCard()
+		this.getCard();
 	},
 	methods: {
 		getCard() {
 			this.$u.api.pageShoppingCart().then(res => {
-				const {data, code} = res.data
+				const { data, code } = res.data;
 				if (code === '200') {
-					if(!data || data.length <= 0){
-						this.cartList = []
-						this.$forceUpdate()
-						return false
+					if (!data || data.length <= 0) {
+						this.cartList = [];
+						this.$forceUpdate();
+						return false;
 					}
 					this.cartList = data.map(v => {
 						v.checked = false;
 						return v;
 					});
-					this.$forceUpdate()
+					this.$forceUpdate();
 				}
 			});
 		},
 		// 获取收货地址
-		getData(){
+		getData() {
 			this.$u.api.pageMemberReceive().then(res => {
-				const {data,code} = res.data
-				if(code === '200'){
-					this.addressList = data
+				const { data, code } = res.data;
+				if (code === '200') {
+					this.addressList = data;
 				}
-			})
+			});
 		},
 		/**
 		 * 选择或取消全部
@@ -215,7 +212,7 @@ export default {
 							title: `删除成功`,
 							type: 'success'
 						});
-						this.getCard()
+						this.getCard();
 					} else {
 						this.$refs.uTips.show({
 							title: res.data.msg,
@@ -261,12 +258,15 @@ export default {
 					orderPrice: this.allPrice
 				})
 				.then(res => {
-					this.showPay = false
-					this.$refs.payRef.clearLoading()
-					this.clearCard()
-					this.$u.route({
-						url: `/pages/Order/Order`
-					});
+					this.showPay = false;
+					this.$refs.payRef.clearLoading();
+					this.clearCard();
+					const { data, code } = res.data;
+					if (code === '200') {
+						this.$u.route({
+							url: `/pages/Pay/Pay?orderId=${data}`
+						});
+					}
 				})
 				.catch(() => {
 					this.$refs.uTips.show({
@@ -331,6 +331,9 @@ export default {
 						display: flex;
 						flex-direction: column;
 						align-items: right;
+					}
+					.price{
+						color: #FA3534;
 					}
 				}
 			}

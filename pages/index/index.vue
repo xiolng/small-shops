@@ -13,7 +13,7 @@
 				<u-icon name="phone" size="30rpx" />
 				<text class="item-name">{{ details.shopTel }}</text>
 			</view>
-			<view class="shop-time mr-30">
+			<view class="shop-time">
 				<u-icon name="clock" size="30rpx"></u-icon>
 				<text class="item-name">{{ details.businessHour }}</text>
 			</view>
@@ -60,6 +60,7 @@ export default {
 	onLoad() {
 		this.getDetail();
 		this.getHotShop();
+		console.log('sss', this.$u.sys(), this.$u.os())
 	},
 	methods: {
 		getDetail() {
@@ -100,12 +101,12 @@ export default {
 		color: $u-type-primary;
 	}
 	.shop-box {
-		padding: 20rpx;
+		padding: 10rpx;
 		position: relative;
 		z-index: 9;
-		margin-top: -130rpx;
+		margin-top: -110rpx;
 		background-color: rgba($color: #000000, $alpha: 0.5);
-		border-radius: 60rpx;
+		border-radius: 60rpx 60rpx 0 0;
 	}
 	.shop-title {
 		font-size: 40rpx;

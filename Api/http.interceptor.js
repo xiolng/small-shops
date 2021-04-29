@@ -1,7 +1,9 @@
 import {
 	BASE_URL
 } from "@/Api/BASE_API.js"
-import {goLogin} from '../utils/index.js'
+import {
+	goLogin
+} from '../utils/index.js'
 
 // 这里的vm，就是我们在vue文件里面的this，所以我们能在这里获取vuex的变量，比如存放在里面的token变量
 const install = (Vue, vm) => {
@@ -43,17 +45,9 @@ const install = (Vue, vm) => {
 
 	// 响应拦截，判断状态码是否通过
 	Vue.prototype.$u.http.interceptor.response = (res) => {
+		console.log('33333res', res)
 		if (res.code === '403' || res.statusCode == 403) {
-			uni.showModal({
-				title: `登录失效`,
-				content: `登录失效，请重新登录`,
-				showCancel: false,
-				success: (result) => {
-					uni.removeStorageSync('token')
-					result.confirm && goLogin()
-				}
-			})
-
+			goLogin()
 			return false;
 		}
 		if (res.code == 200 || res.statusCode === 200) {
@@ -66,7 +60,7 @@ const install = (Vue, vm) => {
 			vm.$u.toast('验证失败，请重新登录');
 			setTimeout(() => {
 				// 此为uView的方法，详见路由相关文档
-				vm.$u.route('/pages/Login/Login')
+				vm.$u.route('/pages/wxAuth/wxAuth')
 			}, 1500)
 			return false;
 		} else {
