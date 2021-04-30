@@ -39,15 +39,17 @@ const install = (Vue, vm) => {
 		// 生成订单
 		generateOrder: data => vm.$u.post(`/business/order/generateOrder`, data),
 		// 支付
-		pay: params => vm.$u.get(`/business/product/pay`, params),
+		pay: params => vm.$u.get(`/business/order/pay`, params),
 		// 支付回调-微信使用
 		// notify: data => vm.$u.post(`/business/product/notify`, data),
+		// // 支付回调-前端使用
+		// prePayNotify: params => vm.$u.get(`/business/product/prePayNotify`, params),
 		// 支付回调-前端使用
-		prePayNotify: params => vm.$u.get(`/business/product/prePayNotify`, params),
-		// 支付回调-前端使用
-		getPayStatus: params => vm.$u.get(`/business/product/getPayStatus`, params),
+		getPayStatus: params => vm.$u.get(`/business/order/getPayStatus`, params),
 		// 取消订单
 		cancelOrder: params => vm.$u.get(`/business/order/cancelOrder`, params),
+		// 确认收货
+		receiptOrder: params => vm.$u.get(`/business/order/receiptOrder`, params),
 		/*************************************************
 		 * 购物车管理
 		 *************************************************/
