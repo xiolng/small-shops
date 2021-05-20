@@ -10,7 +10,6 @@ export default {
 	},
 	mutations: {
 		setUserInfo(state, userInfo){
-			console.log(333222111, userInfo)
 			Object.keys(userInfo).map(v => {
 				state[v] = userInfo[v]
 			})
@@ -18,7 +17,6 @@ export default {
 	},
 	actions: {
 		setUserInfoAction(context, userInfo){
-			console.log(111111)
 			context.commit('setUserInfo', userInfo)
 		}
 	}

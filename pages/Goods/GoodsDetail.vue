@@ -1,205 +1,146 @@
 <template>
-	<view class="goods-detail">
-		<!-- logo -->
-		<u-image v-if="detail.productCover" :src="`${BASE_URL}/files/${detail.productCover}`" width="100%" height="400rpx" />
-		<view class="shop-item">
-			<u-icon name="shopping-cart" size="36rpx"></u-icon>
-			<text class="item-name">{{ detail.productName }}</text>
-		</view>
-		<view class="shop-item">
-			<u-icon name="rmb-circle" size="36rpx" />
-			<text class="item-name">
-			￥ {{Number(detail.productPrice).toFixed(2)}}
-			<text class="origin-txt"> ￥{{Number(detail.originalPrice).toFixed(2)}}</text>
-			</text>
-		</view>
-		<view class="shop-item">
-			<u-icon name="tags" size="36rpx"></u-icon>
-			<view class="item-name"><u-tag v-if="categoryList.length" :text="setTag(detail)" type="warning" size="mini"></u-tag></view>
-		</view>
-		<view class="shop-item">
-			<u-icon name="info-circle" size="36rpx"></u-icon>
-			<text class="item-name">{{ detail.productIntro }}</text>
-		</view>
-		<!-- 底部菜单栏 -->
-		<view class="navigation">
-			<view class="left">
-				<view class="item" @click="showShare = true">
-					<u-icon name="share" :size="40" :color="$u.color['contentColor']"></u-icon>
-					<view class="text u-line-1">分享</view>
-				</view>
-				<view
-					class="item"
-					@click="
-						$u.route({
-							url: `/pages/index/index`,
-							type: 'reLaunch'
-						})
-					"
-				>
-					<u-icon name="home" :size="40" :color="$u.color['contentColor']"></u-icon>
-					<view class="text u-line-1">店铺</view>
-				</view>
-				<view
-					class="item car"
-					@click="
-						$u.route({
-							url: `/pages/Card/Card`,
-							type: 'reLaunch'
-						})
-					"
-				>
-					<u-badge class="car-num" :count="carLength" type="error" :offset="[-3, -6]" :overflow-count="99" absolute show-zero></u-badge>
-					<u-icon name="shopping-cart" :size="40" :color="$u.color['contentColor']"></u-icon>
-					<view class="text u-line-1">购物车</view>
-				</view>
-			</view>
-			<view class="right">
-				<view
-					class="cart btn u-line-1"
-					@click="
-						showPay = false;
-						showCar = true;
-					"
-				>
-					加入购物车
-				</view>
-				<view
-					class="buy btn u-line-1"
-					@click="
-						showCar = false;
-						showPay = true;
-					"
-				>
-					立即购买
-				</view>
-			</view>
-		</view>
-
-		<!-- 加入购物车 -->
-		<u-modal
-			v-model="showCar"
-			title="加入购物车"
-			@cancel="
-				() => {
-					showCar = false;
-					showPay = false;
-				}
-			"
-			@confirm="addCar()"
-		>
-			<view class="input-box">
-				<view class="input-label">商品数量</view>
-				<view class="input-value"><u-number-box v-model="productNumber" :min="1" :color="numColor"></u-number-box></view>
-			</view>
-		</u-modal>
-
-		<!-- 立即购买 -->
-		<u-modal
-			v-model="showPay"
-			title="立即购买"
-			@cancel="
-				() => {
-					showCar = false;
-					showPay = false;
-				}
-			"
-			show-cancel-button
-			ref="payRef"
-			async-close
-			@confirm="payProduct()"
-		>
-			<view>
-				<view class="input-box">
-					<view class="input-label">商品数量</view>
-					<view class="input-value"><u-number-box v-model="productNumber" :min="1" :color="numColor"></u-number-box></view>
-				</view>
-				<view class="input-box">
-					<view class="input-label">收货地址</view>
-					<view class="input-value"><u-input v-model="addressName" disabled type="select" @click="showAddress = true" border /></view>
-				</view>
-			</view>
-		</u-modal>
-		<u-popup v-model="showAddress" mode="bottom" :height="$u.sys().windowHeight / 2">
-			<view>
-				<view class="address-box" v-for="item in addressList" :key="item.tenantMemberReceiveId" @click="selectAddress(item)">
-					<view class="address-item">
-						<view class="splice-box" style="margin-right: 30rpx;">
-							<view class="address-label"><u-icon name="account"></u-icon></view>
-							<view class="address-val">{{ item.receiveName }}</view>
+	<movable-area class="movable-box">
+		<view class="goods-detail">
+			<!-- logo -->
+			<u-image v-if="detail.productCover" :src="`${BASE_URL}/files/${detail.productCover}`" width="100%" height="400rpx" />
+			<view class="stock-box">
+				<view class="item-box">
+					<view class="item-title">
+						<text>{{ productType == '1' ? '券码' : '商品' }}详情</text>
+						<view v-if="changeCardItem(detail)" class="price-btn">
+							<price-number v-if="changeCardItem(detail)" :price="bindCard(detail)" @getPrice="getPrice($event, detail)"></price-number>
 						</view>
-						<view class="splice-box">
-							<view class="address-label"><u-icon name="phone"></u-icon></view>
-							<view class="address-val">{{ item.receivePhone }}</view>
+						<u-button v-else type="primary" size="mini" @click="addCar()">加入购物车</u-button>
+					</view>
+					<view class="item-content">
+						<view class="item-tab">
+							<view class="label">名称：</view>
+							<view class="val">{{ detail.productName }}</view>
+						</view>
+						<view class="item-tab">
+							<view class="label">价格：</view>
+							<view class="val">
+								<text class="item-name">
+									￥ {{ Number(detail.productPrice).toFixed(2) }}
+									<text class="origin-txt">￥{{ Number(detail.originalPrice).toFixed(2) }}</text>
+								</text>
+							</view>
+						</view>
+						<view class="item-tab">
+							<view class="label">分类：</view>
+							<view class="val"><u-tag v-if="categoryList.length" :text="setTag(detail)" type="warning" size="mini"></u-tag></view>
+						</view>
+						<view class="item-tab">
+							<view class="label">描述：</view>
+							<view class="val">
+								<text class="item-name">{{ detail.productIntro }}</text>
+							</view>
 						</view>
 					</view>
-					<view class="address-item">
-						<view class="address-label"><u-icon name="map"></u-icon></view>
-						<view class="address-val">{{ item.receiveAddress }}</view>
-					</view>
-				</view>
-				<view class="no-address" v-if="!addressList.length">
-					<view class="title">暂无收货地址</view>
-					<view class="btn-box" @click="$u.route(`/pages/My/AddSite`)">现在去填写</view>
 				</view>
 			</view>
-		</u-popup>
-		<u-popup v-model="showShare" mode="bottom">
-			<view class="share-box">
-				<u-button type="default" open-type="share">
-					<u-icon name="chat" size="100" color="#00aa00" />
-					<view>分享好友</view>
-				</u-button>
-				<u-button
-					type="default"
-					@click="
+
+			<view class="stock-box" v-if="productType == '1'">
+				<view class="item-box">
+					<view class="item-title">券码说明</view>
+					<view class="item-content">
+						<view class="item-tab">
+							<view class="label">有效期：</view>
+							<view class="val">{{ detail.startTime }}/{{ detail.endTime }}</view>
+						</view>
+						<view class="item-tab">
+							<view class="label">使用范围：</view>
+							<view class="val">{{ detail.applyRange }}</view>
+						</view>
+						<view class="item-tab">
+							<view class="label">使用规则：</view>
+							<view class="val">{{ detail.useRole }}</view>
+						</view>
+						<view class="item-tab">
+							<view class="label">使用时间：</view>
+							<view class="val">{{ detail.useTime }}</view>
+						</view>
+						<view class="item-tab">
+							<view class="label">不可用：</view>
+							<view class="val">{{ detail.unAvailable }}</view>
+						</view>
+					</view>
+				</view>
+			</view>
+			<movable-view class="search-btn" :x="x" :y="y" direction="all" @change="onChange" inertia @click="showSearch = true">
+				<view class="search-box" @click="showShare = true">
+					<u-icon name="zhuanfa" size="34rpx"></u-icon>
+					<text class="txt">分享</text>
+				</view>
+			</movable-view>
+
+			<card-order :cardData="cardData" @getPrice="getPrice" @getCarLength="getCarLength"></card-order>
+			<!-- 底部菜单栏 -->
+
+			<u-popup v-model="showShare" mode="bottom">
+				<view class="share-box">
+					<u-button type="default" open-type="share">
+						<u-icon name="chat" size="100" color="#00aa00" />
+						<view>分享好友</view>
+					</u-button>
+					<u-button
+						type="default"
+						@click="
+							showShare = false;
+							showShareBanner = true;
+						"
+					>
+						<u-icon name="photo" size="100" color="#ff5500" />
+						<view>生成海报</view>
+					</u-button>
+				</view>
+			</u-popup>
+			<ShareGoods
+				v-if="showShareBanner"
+				@cancel="
+					() => {
 						showShare = false;
-						showShareBanner = true;
-					"
-				>
-					<u-icon name="photo" size="100" color="#ff5500" />
-					<view>生成海报</view>
-				</u-button>
-			</view>
-		</u-popup>
-		<ShareGoods
-			v-if="showShareBanner"
-			@cancel="
-				() => {
-					showShare = false;
-					showShareBanner = false;
-				}
-			"
-			:goods-detail="detail"
-		></ShareGoods>
-		<u-top-tips ref="uTips" />
-	</view>
+						showShareBanner = false;
+					}
+				"
+				:goods-detail="detail"
+			></ShareGoods>
+			<u-top-tips ref="uTips" />
+		</view>
+	</movable-area>
 </template>
 
 <script>
 import { BASE_URL } from '../../Api/BASE_API.js';
-import ShareGoods from '../../components/ShareGoods/ShareGoods.vue';
+import ShareGoods from '@/components/ShareGoods/ShareGoods.vue';
+import PriceNumber from '@/components/PriceNumber/PriceNumber.vue';
+import CardOrder from '@/components/CardOrder/CardOrder.vue'
 export default {
 	components: {
-		ShareGoods
+		ShareGoods,
+		PriceNumber,
+		CardOrder
 	},
 	data() {
 		return {
 			BASE_URL,
 			detail: {},
-			carLength: 0,
+			cardData: {},
 			goodsId: '',
 			productNumber: 1,
-			showCar: false,
-			showPay: false,
 			numColor: this.$u.color.error,
-			showAddress: false,
-			addressList: [],
-			tenantMemberReceiveId: '',
-			addressName: '',
 			categoryList: [],
 			showShare: false,
-			showShareBanner: false
+			showShareBanner: false,
+			productType: 0,
+			showCard: false,
+			x: this.$u.sys().windowWidth - 90,
+			y: this.$u.sys().windowHeight - 200,
+			old: {
+				x: this.$u.sys().windowWidth - 90,
+				y: this.$u.sys().windowHeight - 200
+			},
+			showAllBtn: false
 		};
 	},
 	mounted() {
@@ -208,10 +149,13 @@ export default {
 	onLoad(option) {
 		console.log('option', option);
 		this.goodsId = option.id;
+		this.productType = option.productType;
 		this.getGoodsItem();
 		this.getDetail(option.id);
 		uni.getStorageSync('token') && this.getCarLength();
-		uni.getStorageSync('token') && this.getData();
+	},
+	onShow() {
+		this.getCarLength()
 	},
 	onShareAppMessage(e) {
 		console.log('e', e);
@@ -236,6 +180,62 @@ export default {
 		};
 	},
 	methods: {
+		getPrice(val, item) {
+			this.cardData.data.map(v => {
+				if (v.productId == item.productId) {
+					if (val <= 0) {
+						this.$u.api
+							.removeShoppingCart({
+								shoppingCartDetailIds: v.memberShoppingCartDetailId
+							})
+							.then(res => {
+								this.getCarLength();
+							});
+						return false;
+					}
+					if (val == v.productNumber) return;
+					this.$u.api
+						.updateShoppingCartCount({
+							memberShoppingCartDetailId: v.memberShoppingCartDetailId,
+							productId: item.productId,
+							productPrice: item.productPrice,
+							productNumber: val
+						})
+						.then(res => {
+							if (res.data.code === '200') {
+								this.getCarLength();
+							}
+						});
+				}
+			});
+		},
+		bindCard(item) {
+			let productNumber = 0;
+			this.cardData.data.map((v, index) => {
+				if (v.productId == item.productId) {
+					productNumber = v.productNumber;
+				}
+			});
+			console.log('productNumber', productNumber);
+			return productNumber;
+		},
+		changeCardItem(item) {
+			if (!this.cardData.data) {
+				return false;
+			}
+			let isCard = false;
+			this.cardData.data.map((v, index) => {
+				if (v.productId == item.productId) {
+					this.cardIndex = index;
+					isCard = v.productNumber;
+				}
+			});
+			return isCard;
+		},
+		onChange: function(e) {
+			this.old.x = e.detail.x;
+			this.old.y = e.detail.y;
+		},
 		getDetail(productId) {
 			this.$u.api
 				.getProductById({
@@ -244,6 +244,7 @@ export default {
 				.then(res => {
 					if (res.data.code === '200') {
 						this.detail = res.data.data;
+						this.productType = this.detail.productType;
 					}
 				});
 		},
@@ -258,17 +259,50 @@ export default {
 		getCarLength() {
 			this.$u.api.pageShoppingCart({ pageNum: 1, pageSize: 10 }).then(res => {
 				if (res.data.code === '200') {
-					this.carLength = res.data.total;
+					console.log(111, res.data);
+					this.cardData = res.data;
 				}
 			});
 		},
-		getData() {
-			this.$u.api.pageMemberReceive().then(res => {
-				const { data, code } = res.data;
-				if (code === '200') {
-					this.addressList = data;
-				}
-			});
+		clearCard() {
+			this.$u.api
+				.clearShoppingCart({
+					memberShoppingCartId: this.cardData.data[0].memberShoppingCartId
+				})
+				.then(res => {
+					if (res.data.code === '200') {
+						this.$refs.uTips.show({
+							type: 'success',
+							title: '已清空购物车'
+						});
+						this.getCarLength();
+					}
+				});
+		},
+		/**
+		 * 数量改变
+		 * @param {Object} e
+		 */
+		valChange(e) {
+			console.log('当前值为: ' + e.value);
+			this.cardData.data[e.index].productNumber = e.value;
+			if (e.value <= 0) {
+				this.$u.api
+					.removeShoppingCart({
+						shoppingCartDetailIds: this.cardData.data[e.index].memberShoppingCartDetailId
+					})
+					.then(res => {
+						this.getCarLength();
+					});
+				return false;
+			}
+			this.$u.api
+				.updateShoppingCartCount({
+					...this.cardData.data[e.index]
+				})
+				.then(res => {
+					this.getCarLength();
+				});
 		},
 		// 添加到购物车
 		addCar() {
@@ -289,50 +323,12 @@ export default {
 		},
 		setTag(detail) {
 			const data = this.categoryList.filter(v => v.productCategoryId === detail.productCategoryId);
-			console.log('data', data[0] && data[0].categoryName);
 			return data[0] && data[0].categoryName;
 		},
-		selectAddress(item) {
-			this.tenantMemberReceiveId = item.tenantMemberReceiveId;
-			this.addressName = item.receiveAddress;
-			this.showAddress = false;
-		},
 		payProduct() {
-			if (!this.addressName) {
-				this.$refs.uTips.show({
-					type: 'error',
-					title: '请选择收货地址'
-				});
-				this.$refs.payRef.clearLoading();
-				return false;
-			}
-			const data = this.$u.deepClone(this.detail);
-			data.productNumber = 1;
-			this.$u.api
-				.generateOrder({
-					productList: [data],
-					tenantMemberReceiveId: this.tenantMemberReceiveId,
-					buyCount: this.productNumber,
-					orderPrice: (data && data.productPrice * this.productNumber) || 0
-				})
-				.then(res => {
-					this.showCar = false;
-					this.showPay = false;
-					const { data, code } = res.data;
-					console.log('erer', res.data);
-					if (code === '200') {
-						this.$u.route({
-							url: `/pages/Pay/Pay?orderId=${data}`
-						});
-					}
-				})
-				.catch(() => {
-					this.$refs.uTips.show({
-						type: 'error',
-						title: '服务器错误，请联系管理员'
-					});
-					this.$refs.payRef.clearLoading();
-				});
+			uni.navigateTo({
+				url: `/pages/Pay/CreateOrder`
+			});
 		},
 		clickShare(index) {
 			switch (index) {
@@ -348,11 +344,60 @@ export default {
 					this.showShareBanner = false;
 			}
 		}
+	},
+	computed: {
+		/**
+		 * 总价格
+		 */
+		allPrice: {
+			get: function() {
+				let allPrice = 0;
+				console.log('this.card', this.cardData);
+				this.cardData.data &&
+					this.cardData.data.map(v => {
+						allPrice += v.productNumber * v.productPrice;
+					});
+				return allPrice;
+			}
+		}
 	}
 };
 </script>
 
 <style lang="scss">
+.movable-box {
+	width: 100%;
+	min-height: 100vh;
+}
+.search-btn {
+	width: 100rpx;
+	height: 100rpx;
+	position: fixed;
+	right: 0;
+	z-index: 9999;
+	width: 100rpx;
+	background-color: $u-type-primary;
+	border-radius: 100%;
+	.search-box {
+		height: 100rpx;
+		color: #fff;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		.txt {
+			font-size: 20rpx;
+		}
+	}
+	.u-icon {
+		width: 100rpx;
+		height: 40rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-bottom: 0;
+	}
+}
 .goods-detail {
 	padding-bottom: 100rpx;
 	.shop-item {
@@ -365,7 +410,7 @@ export default {
 		.item-name {
 			margin-left: 20rpx;
 			color: red;
-			.origin-txt{
+			.origin-txt {
 				color: #999;
 				font-style: oblique;
 				text-decoration: line-through;
@@ -373,52 +418,7 @@ export default {
 			}
 		}
 	}
-	.navigation {
-		width: 100%;
-		position: fixed;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		display: flex;
-		margin-top: 100rpx;
-		border: solid 2rpx #f2f2f2;
-		background-color: #ffffff;
-		padding: 16rpx 0;
-		.left {
-			display: flex;
-			font-size: 20rpx;
-			.item {
-				margin: 0 30rpx;
-				&.car {
-					text-align: center;
-					position: relative;
-					.car-num {
-						position: absolute;
-						top: -10rpx;
-						right: -10rpx;
-					}
-				}
-			}
-		}
-		.right {
-			display: flex;
-			font-size: 28rpx;
-			align-items: center;
-			.btn {
-				line-height: 66rpx;
-				padding: 0 30rpx;
-				border-radius: 36rpx;
-				color: #ffffff;
-			}
-			.cart {
-				background-color: #ed3f14;
-				margin-right: 30rpx;
-			}
-			.buy {
-				background-color: #ff7900;
-			}
-		}
-	}
+	
 	.input-box {
 		padding: 40rpx 20rpx;
 		display: flex;
@@ -468,7 +468,7 @@ export default {
 		display: flex;
 		flex-direction: row;
 		justify-content: space-around;
-		padding: 40rpx 40rpx 0;
+		padding: 40rpx 40rpx 120rpx;
 		.u-btn {
 			width: 100%;
 			height: auto;
@@ -479,6 +479,117 @@ export default {
 			border-width: 0;
 			&::after {
 				border: none;
+			}
+		}
+	}
+	.stock-box {
+		margin: 20rpx 0;
+		padding: 20rpx;
+		.item-box {
+			background-color: #fff;
+			border-radius: 20rpx;
+			border: 1px solid #dddddd;
+			padding: 20rpx 20rpx;
+			.item-title {
+				font-size: 30rpx;
+				margin-bottom: 10rpx;
+				padding: 10rpx 10rpx 10rpx 18rpx;
+				border-bottom: 1px solid #c2c2c2;
+				position: relative;
+				display: flex;
+				justify-content: space-between;
+				&::after {
+					content: ' ';
+					width: 7rpx;
+					background-color: #007aff;
+					position: absolute;
+					left: 0;
+					top: 12rpx;
+					bottom: 10rpx;
+				}
+			}
+			.item-content {
+				padding: 20rpx 10rpx;
+				.item-tab {
+					display: flex;
+					margin-bottom: 20rpx;
+					.label {
+						width: 140rpx;
+						flex-shrink: 0;
+						color: #999;
+						text-align: right;
+					}
+					.val {
+						font-size: 24rpx;
+						.item-name {
+							margin-left: 20rpx;
+							color: red;
+							.origin-txt {
+								color: #999;
+								font-style: oblique;
+								text-decoration: line-through;
+								margin-left: 20rpx;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	.card-box {
+		padding: 20rpx;
+		.card-title {
+			padding: 20rpx 0;
+			border-bottom: 1px solid #eee;
+			display: flex;
+			justify-content: space-between;
+			.left-label {
+				font-size: 24rpx;
+			}
+			.right-clear {
+				font-size: 24rpx;
+			}
+		}
+		.card-content {
+			padding: 20rpx 0;
+			.card-list {
+				.card-item {
+					display: flex;
+					padding: 20rpx 0;
+					border-bottom: 1rpx solid #eee;
+					.item-img {
+						width: 120rpx;
+						height: 120rpx;
+						flex-shrink: 0;
+					}
+
+					.item-box {
+						display: flex;
+						flex-direction: column;
+						flex-grow: 1;
+						justify-content: space-between;
+						margin-left: 10rpx;
+						.item-title {
+							font-size: 30rpx;
+						}
+						.item-price {
+							display: flex;
+							justify-content: space-between;
+							align-items: flex-end;
+							.price-box {
+								color: red;
+								.price-icon {
+									font-size: 24rpx;
+								}
+								.price-num {
+									font-size: 30rpx;
+								}
+							}
+							.item-num {
+							}
+						}
+					}
+				}
 			}
 		}
 	}

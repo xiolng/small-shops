@@ -57,6 +57,8 @@ const install = (Vue, vm) => {
 		pageShoppingCart: data => vm.$u.post(`/business/shoppingCart/pageShoppingCart`, data),
 		// 添加到购物车
 		addShoppingCart: data => vm.$u.post(`/business/shoppingCart/addShoppingCart`, data),
+		// 编辑购物车
+		updateShoppingCartCount: data => vm.$u.post(`/business/shoppingCart/updateShoppingCartCount`, data),
 		// 移除购物车
 		removeShoppingCart: data => vm.$u.get(`/business/shoppingCart/removeShoppingCart`, data),
 		// 清空购物车
@@ -68,6 +70,8 @@ const install = (Vue, vm) => {
 		forgotPassword: data => vm.$u.post(`/business/member/forgotPassword`, data),
 		// 忘记密码获取验证码
 		forgotPasswordCode: params => vm.$u.get(`/business/member/forgotPasswordCode`, params),
+		// 上传用户头像
+		upload: data => vm.$u.post(`/api/file/upload`, data),
 		// 获取会员信息
 		getMember: params => vm.$u.get(`/business/member/getMember`, params),
 		// 修改密码

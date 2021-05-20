@@ -29,8 +29,9 @@ export const goLogin = () => {
 								uni.setStorageSync('userInfo', user.data.data)
 								Vue.prototype.$store.dispatch('setUserInfoAction', user.data
 									.data)
+									console.log('aaaaaaaaaaaaa', uni.getCurrentPages)
 									uni.navigateBack({
-										delta: 1
+										delta: 0
 									})
 							})
 						} else {

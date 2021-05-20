@@ -3,7 +3,8 @@
 		<u-form :form="form" label-width="180">
 			<u-form-item label="用户名"><u-input v-model="form.nickName" placeholder="请输入用户名"></u-input></u-form-item>
 			<u-form-item label="头像">
-				<u-upload
+				<!-- <u-upload
+					ref="uUpload"
 					:action="action"
 					:file-list="fileList"
 					max-count="1"
@@ -12,7 +13,13 @@
 					@on-success="changeImgSuccess"
 					@on-remove="removeImg"
 					:header="header"
-				></u-upload>
+					:show-progress="false"
+					:deletable="false"
+					:show-upload-list="false"
+				>
+				</u-upload> -->
+					<u-avatar v-if="form.avatarUrl" :src="form.avatarUrl.includes('https') ? form.avatarUrl : `${BASE_URL}/files/${form.avatarUrl}`" size="140" @click="uploadImage" mode="square"></u-avatar>
+					<u-avatar v-else :src="`${form.avatarUrl}`" size="140" @click="uploadImage" mode="square"></u-avatar>
 			</u-form-item>
 			<!-- <u-form-item label="真实姓名"><u-input v-model="form.realName" placeholder="请输入真实姓名"></u-input></u-form-item> -->
 		</u-form>
@@ -52,8 +59,8 @@ export default {
 					Object.keys(this.form).map(v => {
 						this.form[v] = data[v];
 					});
-					this.fileList = data.avatarUrl.includes('https') ? [{ url: data.avatarUrl }] : [{ url: `${BASE_URL}/files/${data.avatarUrl}` }];
-					console.log('fileList', this.fileList);
+					// this.fileList = data.avatarUrl.includes('https') ? [{ url: data.avatarUrl }] : [{ url: `${BASE_URL}/files/${data.avatarUrl}` }];
+					// console.log('fileList', this.fileList);
 				}
 			});
 		},
@@ -77,6 +84,33 @@ export default {
 						}, 1500);
 					}
 				});
+		},
+		uploadImage() {
+			const vm = this
+			uni.chooseImage({
+				count: 1,
+				success(res) {
+					uni.downloadFile({
+						url: res.tempFilePaths[0],
+						success: imgData => {
+							uni.uploadFile({
+								name: 'file',
+								url: BASE_URL + '/api/file/upload',
+								header: {
+									Authorization: uni.getStorageSync('token')
+								},
+								filePath: imgData.tempFilePath,
+								success(result) {
+									const { data, code, msg } = JSON.parse(result.data);
+									if (code === '200') {
+										vm.form.avatarUrl = data;
+									}
+								}
+							});
+						}
+					});
+				}
+			});
 		},
 		/**
 		 * 上传图片失败

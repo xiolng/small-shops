@@ -63,8 +63,8 @@ export default {
 					posterCanvasId: _this.canvasId, //canvasId
 					delayTimeScale: 20, //延时系数
 					background: {
-						height: 1000,
-						width: 1000,
+						height: this.poster.width || 1000,
+						width: this.poster.height || 1000,
 						backgroundColor:"#fff"
 					},
 					setCanvasWH({ bgObj }) {

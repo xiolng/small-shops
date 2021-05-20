@@ -12,6 +12,7 @@
   "author": "zzn",
   "license": "ISC",
   "dependencies": {
+    "tki-qrcode": "^0.1.6",
     "uview-ui": "^1.8.3"
   }
 }

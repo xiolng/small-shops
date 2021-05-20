@@ -4,7 +4,16 @@
 			<!-- <movable-view class="search-btn" :x="x" :y="y" direction="all" @change="onChange" inertia @click="showSearch = true">
 				<u-icon name="search" size="40rpx"></u-icon>
 			</movable-view> -->
-			<scroll-view scroll-y style="height: 100vh;width: 100%;" @scrolltolower="onreachBottom"><order-list ref="OrderList" :order-list="orderList" /></scroll-view>
+			<scroll-view scroll-y style="height: 100vh;width: 100%;" @scrolltolower="onreachBottom">
+				<order-list
+					ref="OrderList"
+					:order-list="orderList"
+					@get-list="
+						page.pageNum = 1;
+						getOrder();
+					"
+				/>
+			</scroll-view>
 		</movable-area>
 		<!-- search -->
 		<!-- <u-popup v-model="showSearch" width="80%" border-radius="20">
@@ -42,7 +51,8 @@ export default {
 				buyerAddress: '',
 				buyerName: '',
 				buyerTel: '',
-				orderStatus: 0
+				orderStatus: 0,
+				// productType: 0
 			},
 			page: {
 				pageNum: 1,
@@ -58,8 +68,11 @@ export default {
 			orderList: []
 		};
 	},
-	mounted() {
+	onShow() {
 		this.getOrder();
+	},
+	onHide() {
+		this.page.pageNum = 1;
 	},
 	methods: {
 		getOrder() {
@@ -75,10 +88,10 @@ export default {
 					this.searchData.orderStatus = 0;
 					const { data, code, total } = res.data;
 					if (code === '200') {
+						if (this.page.pageNum == 1) {
+							this.orderList = [];
+						}
 						if (!data || data.length <= 0) {
-							if(this.page.pageNum == 1){
-								this.orderList = []
-							}
 							this.$refs.uTips.show({
 								title: '已加载全部',
 								type: 'warning'
@@ -103,7 +116,7 @@ export default {
 		// scroll-view到底部加载更多
 		onreachBottom() {
 			this.getOrder();
-		},
+		}
 	},
 	onPullDownRefresh() {
 		this.getOrder();

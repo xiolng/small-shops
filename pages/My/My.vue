@@ -15,7 +15,7 @@
 
 		<view class="u-m-t-20">
 			<u-cell-group>
-				<u-cell-item
+				<!-- <u-cell-item
 					icon="order"
 					:icon-style="{ color: $u.color.warning }"
 					title="订单管理"
@@ -23,6 +23,17 @@
 						isLogin() &&
 							$u.route({
 								url: `/pages/Order/Order`
+							})
+					"
+				></u-cell-item> -->
+				<u-cell-item
+					icon="coupon"
+					:icon-style="{ color: $u.color.warning }"
+					title="券码"
+					@click="
+						isLogin() &&
+							$u.route({
+								url: `/pages/StockOrder/StockOrder`
 							})
 					"
 				></u-cell-item>

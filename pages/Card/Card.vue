@@ -168,6 +168,12 @@ export default {
 				const { data, code } = res.data;
 				if (code === '200') {
 					this.addressList = data;
+					this.addressList.map(v => {
+						if(v.isDefault){
+							this.tenantMemberReceiveId = v.tenantMemberReceiveId;
+							this.addressName = v.receiveAddress;
+						}
+					});
 				}
 			});
 		},
@@ -252,7 +258,7 @@ export default {
 			}
 			this.$u.api
 				.generateOrder({
-					productList: this.cartList.filter(v => v.checked),
+					productList: this.cartList.filter(v => v.checked).map(v => ({productId: v.productId, productNumber: v.productNumber})),
 					tenantMemberReceiveId: this.tenantMemberReceiveId,
 					buyCount: this.cartList.filter(v => v.checked).length,
 					orderPrice: this.allPrice

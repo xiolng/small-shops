@@ -1,8 +1,8 @@
 <template>
 	<view class="pay-box">
-		<view class="order-time">
+		<!-- <view class="order-time">
 			<text class="time-txt">{{ orderTime === '00:00' ? '订单已失效，请重新下单' : orderTime }}</text>
-		</view>
+		</view> -->
 		<view class="order-item">
 			<view class="order-label">订单编码：</view>
 			<view class="order-val">{{ orderDetail.orderNo }}</view>
@@ -63,24 +63,24 @@ export default {
 	},
 	onLoad(option) {
 		option.orderId && this.getOrder(option.orderId);
-		this.changeTime();
+		// this.changeTime();
 	},
 	onHide() {
-		clearInterval(this.timer);
-		this.timer = null;
+		// clearInterval(this.timer);
+		// this.timer = null;
 	},
 	onUnload() {
-		clearInterval(this.timer);
-		this.timer = null;
+		// clearInterval(this.timer);
+		// this.timer = null;
 	},
 	methods: {
-		getOrder(id) {
-			this.$u.api.getOrderById({ id }).then(res => {
+		getOrder(orderId) {
+			this.$u.api.getOrderById({ orderId }).then(res => {
 				const { data, code } = res.data;
 				if (code === '200') {
 					this.orderDetail = data;
-					this.orderTime = '10:00';
-					this.changeTime();
+					// this.orderTime = '10:00';
+					// this.changeTime();
 				}
 			});
 		},
@@ -148,10 +148,10 @@ export default {
 						this.$u.toast(`支付成功`);
 						uni.hideLoading();
 						setTimeout(() => {
-							uni.redirectTo({
+							uni.switchTab({
 								url: `/pages/Order/Order`
 							});
-						}, 1000);
+						}, 100);
 					} else if (data == 5) {
 						this.$u.toast(`支付失败`);
 						uni.hideLoading();

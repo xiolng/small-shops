@@ -6,8 +6,8 @@
 				<view class="content-txt">买家电话：{{ item.buyerTel }}</view>
 				<view class="content-txt">订单状态：{{ orderStatus[item.orderStatus] }}</view>
 				<view class="content-txt">订单编号：{{ item.orderNo }}</view>
-				<view class="content-txt" v-if='item.logsticsNo'>物流单号：{{ item.logisticsNo }}</view>
-				<view class="content-txt" v-if='item.logsticsName'>物流公司：{{ item.logisticsName}}</view>
+				<view class="content-txt" v-if="item.logsticsNo">物流单号：{{ item.logisticsNo }}</view>
+				<view class="content-txt" v-if="item.logsticsName">物流公司：{{ item.logisticsName }}</view>
 			</view>
 			<view class="goods-list">
 				<view class="goods-item" v-for="(goods, index) in item.orderDetailListOutDTOList" :key="index">
@@ -17,7 +17,9 @@
 						<view class="detail-txt">商品数量：{{ goods.productNumber }}</view>
 						<view class="detail-txt">单价：{{ goods.productPrice }}</view>
 					</view>
-					<view class="tip-box" :class="{active: !getIsUsed(goods) == '0'}" v-if="goods.productType == '1' && item.payStatus == 4">{{!getIsUsed(goods) == '0' ? '未使用':'已使用'}}</view>
+					<view class="tip-box" :class="{ active: !getIsUsed(goods) == '0' }" v-if="goods.productType == '1' && item.payStatus == 4">
+						{{ !getIsUsed(goods) == '0' ? '未使用' : '已使用' }}
+					</view>
 				</view>
 			</view>
 			<view class="all-price">共{{ item.buyCount }}件，总价格：{{ item.orderPrice }}元</view>
@@ -28,7 +30,7 @@
 			<view class="order-btn">
 				<u-button v-if="item.payStatus <= 0" type="error" size="mini" @click="pushGoods(item)">支付</u-button>
 				<u-button v-if="item.payStatus == 4 && (item.orderStatus >= 3 && item.orderStatus <= 7)" type="primary" size="mini" @click="ConfirmReceipt(item)">确认收货</u-button>
-				</view>
+			</view>
 		</view>
 
 		<u-loadmore :status="status" />
@@ -38,7 +40,7 @@
 
 <script>
 import { BASE_URL } from '../../Api/BASE_API.js';
-import{orderStatus} from '../../utils/statusBase.js'
+import { orderStatus } from '../../utils/statusBase.js';
 export default {
 	props: {
 		orderList: Array
@@ -57,17 +59,17 @@ export default {
 	},
 	mounted() {},
 	methods: {
-		ConfirmReceipt(item){
-			this.$u.api.receiptOrder({orderId: item.orderId}).then(res => {
-				const {data, code} = res.data
-				if(code === '200'){
+		ConfirmReceipt(item) {
+			this.$u.api.receiptOrder({ orderId: item.orderId }).then(res => {
+				const { data, code } = res.data;
+				if (code === '200') {
 					this.$refs.uTips.show({
 						title: '确认收货成功',
 						type: 'primary'
-					})
-					this.$emit('get-list')
+					});
+					this.$emit('get-list');
 				}
-			})
+			});
 		},
 		pushGoods(item) {
 			uni.navigateTo({
@@ -91,9 +93,8 @@ export default {
 			// 		}
 			// 	});
 		},
-		goDetail(item){
-			console.log('items, ', item)
-			this.$u.route(`/pages/Order/OrderDetail?id=${item.orderId}`)
+		goDetail(item) {
+			this.$u.route(`/pages/StockOrder/StockOrderDetail?id=${item.orderId}`);
 		},
 		// 总价格
 		addPrice(item) {
@@ -103,10 +104,10 @@ export default {
 			});
 			return allPrice;
 		},
-		getIsUsed(item){
-			const list = (item && item.orderCardNoList) || []
-			console.log('item', item, list)
-			return list.length && list.some(v => v.isUsed == '0')
+		getIsUsed(item) {
+			const list = (item && item.orderCardNoList) || [];
+			console.log('item', item, list);
+			return list.length && list.some(v => v.isUsed == '0');
 		}
 	}
 };
@@ -148,11 +149,11 @@ export default {
 						font-size: 24rpx;
 					}
 				}
-				.tip-box{
+				.tip-box {
 					flex-shrink: 0;
 					flex-wrap: nowrap;
 					color: #999;
-					&.active{
+					&.active {
 						color: $u-type-error;
 					}
 				}

@@ -11,7 +11,7 @@
 		<view class="shop-phone mr-30">
 			<view>
 				<u-icon name="phone" size="30rpx" />
-				<text class="item-name">{{ details.shopTel }}</text>
+				<text class="item-name" @click="callPhone(details.shopTel)">{{ details.shopTel }}</text>
 			</view>
 			<view class="shop-time">
 				<u-icon name="clock" size="30rpx"></u-icon>
@@ -60,7 +60,7 @@ export default {
 	onLoad() {
 		this.getDetail();
 		this.getHotShop();
-		console.log('sss', this.$u.sys(), this.$u.os())
+		console.log('sss', this.$u.sys(), this.$u.os());
 	},
 	methods: {
 		getDetail() {
@@ -68,7 +68,7 @@ export default {
 				if (res.data.code === '200') {
 					this.details = res.data.data;
 					this.details.shopLogo = `${BASE_URL}/files/${res.data.data.shopLogo}`;
-					uni.setStorageSync('shopDetail', this.details)
+					uni.setStorageSync('shopDetail', this.details);
 				}
 			});
 		},
@@ -80,14 +80,25 @@ export default {
 				}
 			});
 		},
+		callPhone(phone) {
+			uni.makePhoneCall({
+				phoneNumber: phone
+			});
+		},
 		goDetail(item1) {
+			const data = {
+				id: item1.productId
+			};
+			if (item1.productType == 1) {
+				data.productType = 1;
+			}
 			this.$u.route({
 				url: `/pages/Goods/GoodsDetail`,
 				params: {
-					id: item1.productId
+					...data
 				}
 			});
-		},
+		}
 	}
 };
 </script>
