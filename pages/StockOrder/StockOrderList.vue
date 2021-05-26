@@ -2,37 +2,37 @@
 	<view class="order-list-page">
 		<view class="order-item u-border" v-for="item in orderList" :key="item.orderId" @click="goDetail(item)">
 			<view class="order-content">
-				<view class="content-txt">买家姓名：{{ item.buyerName }}</view>
-				<view class="content-txt">买家电话：{{ item.buyerTel }}</view>
-				<view class="content-txt">订单状态：{{ orderStatus[item.orderStatus] }}</view>
 				<view class="content-txt">订单编号：{{ item.orderNo }}</view>
-				<view class="content-txt" v-if="item.logsticsNo">物流单号：{{ item.logisticsNo }}</view>
-				<view class="content-txt" v-if="item.logsticsName">物流公司：{{ item.logisticsName }}</view>
+				<view class="content-txt" v-if='item.logsticsNo'>物流单号：{{ item.logisticsNo }}</view>
+				<view class="content-txt" v-if='item.logsticsName'>物流公司：{{ item.logisticsName}}</view>
 			</view>
 			<view class="goods-list">
 				<view class="goods-item" v-for="(goods, index) in item.orderDetailListOutDTOList" :key="index">
-					<view class="order-img"><u-image :src="BASE_URL + '/files/' + goods.productCover" width="100%" height="100rpx"></u-image></view>
+					<view class="order-img"><u-image :src="BASE_URL + '/files/' + goods.productCover" width="100%" height="160rpx"></u-image></view>
 					<view class="order-detail">
-						<view class="detail-txt">商品名称：{{ goods.productName }}</view>
-						<view class="detail-txt">商品数量：{{ goods.productNumber }}</view>
-						<view class="detail-txt">单价：{{ goods.productPrice }}</view>
+						<view class="detail-txt" style="font-size: 30rpx; color: #333; margin-bottom: 4rpx;">{{ goods.productName }}</view>
+						<view class="detail-txt">订单状态：{{ orderStatus[item.orderStatus] }}</view>
+						<view class="detail-txt">买家姓名：{{ item.buyerName }}</view>
+						<view class="detail-txt">买家电话：{{ item.buyerTel }}</view>
+						<view class="detail-txt" style="display: flex; justify-content: space-between; align-items: flex-end;">
+							<text style="color: red; font-size: 30rpx;">￥{{ goods.productPrice }}</text>
+							<text>x{{goods.productNumber}}</text>
+						</view>
 					</view>
-					<view class="tip-box" :class="{ active: !getIsUsed(goods) == '0' }" v-if="goods.productType == '1' && item.payStatus == 4">
-						{{ !getIsUsed(goods) == '0' ? '未使用' : '已使用' }}
-					</view>
+					<view class="tip-box" :class="{active: !getIsUsed(goods) == '0'}" v-if="goods.productType == '1' && item.payStatus == 4">{{!getIsUsed(goods) == '0' ? '未使用':'已使用'}}</view>
 				</view>
 			</view>
-			<view class="all-price">共{{ item.buyCount }}件，总价格：{{ item.orderPrice }}元</view>
+			<view class="all-price">总价：{{ item.orderPrice }}元</view>
 			<view class="order-addrenss">
 				<u-icon name="map"></u-icon>
 				<view class="address-txt">{{ item.buyerAddress }}</view>
 			</view>
 			<view class="order-btn">
-				<u-button v-if="item.payStatus <= 0" type="error" size="mini" @click="pushGoods(item)">支付</u-button>
+				<u-button v-if="item.payStatus <= 0 && item.orderStatus < 8" type="error" size="mini" @click="pushGoods(item)">支付</u-button>
 				<u-button v-if="item.payStatus == 4 && (item.orderStatus >= 3 && item.orderStatus <= 7)" type="primary" size="mini" @click="ConfirmReceipt(item)">确认收货</u-button>
-			</view>
+				</view>
 		</view>
-
+	
 		<u-loadmore :status="status" />
 		<u-top-tips ref="uTips" navbar-height="0" />
 	</view>
@@ -99,7 +99,7 @@ export default {
 		// 总价格
 		addPrice(item) {
 			let allPrice = 0;
-			item.orderDetailListOutDTOList.map(v => {
+			item && item.orderDetailListOutDTOList.map(v => {
 				allPrice += +v.productPrice;
 			});
 			return allPrice;
@@ -137,23 +137,26 @@ export default {
 				align-items: center;
 				margin-bottom: 20rpx;
 				.order-img {
-					width: 100rpx;
+					width: 160rpx;
 					flex-shrink: 0;
 					align-items: center;
 					margin-right: 20rpx;
+					border: 1px solid #eee;
+					border-radius: 10rpx;
 				}
 				.order-detail {
 					flex-grow: 1;
 					margin-right: 10rpx;
 					.detail-txt {
-						font-size: 24rpx;
+						font-size: 20rpx;
+						color: #999;
 					}
 				}
-				.tip-box {
+				.tip-box{
 					flex-shrink: 0;
 					flex-wrap: nowrap;
 					color: #999;
-					&.active {
+					&.active{
 						color: $u-type-error;
 					}
 				}

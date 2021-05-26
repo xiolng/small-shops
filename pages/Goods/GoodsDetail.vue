@@ -1,8 +1,26 @@
 <template>
 	<movable-area class="movable-box">
 		<view class="goods-detail">
-			<!-- logo -->
-			<u-image v-if="detail.productCover" :src="`${BASE_URL}/files/${detail.productCover}`" width="100%" height="400rpx" />
+			<view class="goods-main">
+				<!-- logo -->
+				<u-image v-if="detail.productCover" :src="`${BASE_URL}/files/${detail.productCover}`" width="100vw" height="400rpx" />
+				<view class="goods-msg">
+					<view class="msg-left">
+						<view class="price-all">
+							<text class="price-icon">￥</text>
+							<text class="price-txt">{{ Number(detail.productPrice).toFixed(2) }}</text>
+						</view>
+						<view class="price-old">
+							<text class="price-icon">￥</text>
+							<text class="price-txt">{{ Number(detail.originalPrice).toFixed(2) }}</text>
+						</view>
+					</view>
+					<view class="msg-right">
+						<text class="goods-name u-line-1">{{ detail.productName }}</text>
+						<view class="triangle"></view>
+					</view>
+				</view>
+			</view>
 			<view class="stock-box">
 				<view class="item-box">
 					<view class="item-title">
@@ -17,7 +35,7 @@
 							<view class="label">名称：</view>
 							<view class="val">{{ detail.productName }}</view>
 						</view>
-						<view class="item-tab">
+						<!-- <view class="item-tab">
 							<view class="label">价格：</view>
 							<view class="val">
 								<text class="item-name">
@@ -25,7 +43,7 @@
 									<text class="origin-txt">￥{{ Number(detail.originalPrice).toFixed(2) }}</text>
 								</text>
 							</view>
-						</view>
+						</view> -->
 						<view class="item-tab">
 							<view class="label">分类：</view>
 							<view class="val"><u-tag v-if="categoryList.length" :text="setTag(detail)" type="warning" size="mini"></u-tag></view>
@@ -67,7 +85,7 @@
 					</view>
 				</view>
 			</view>
-			<movable-view class="search-btn" :x="x" :y="y" direction="all" @change="onChange" inertia @click="showSearch = true">
+			<movable-view class="search-btn" :x="x" :y="y" direction="all" @change="onChange" inertia>
 				<view class="search-box" @click="showShare = true">
 					<u-icon name="zhuanfa" size="34rpx"></u-icon>
 					<text class="txt">分享</text>
@@ -114,7 +132,7 @@
 import { BASE_URL } from '../../Api/BASE_API.js';
 import ShareGoods from '@/components/ShareGoods/ShareGoods.vue';
 import PriceNumber from '@/components/PriceNumber/PriceNumber.vue';
-import CardOrder from '@/components/CardOrder/CardOrder.vue'
+import CardOrder from '@/components/CardOrder/CardOrder.vue';
 export default {
 	components: {
 		ShareGoods,
@@ -155,7 +173,7 @@ export default {
 		uni.getStorageSync('token') && this.getCarLength();
 	},
 	onShow() {
-		this.getCarLength()
+		this.getCarLength();
 	},
 	onShareAppMessage(e) {
 		console.log('e', e);
@@ -368,6 +386,70 @@ export default {
 .movable-box {
 	width: 100%;
 	min-height: 100vh;
+	.goods-main {
+		width: 100%;
+		display: flex;
+		position: relative;
+		color: #fff;
+		.goods-msg {
+			background: $u-type-primary;
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			display: flex;
+			.msg-left {
+				display: flex;
+				align-items: center;
+				flex-grow: 3;
+				padding: 14rpx;
+				background: linear-gradient(to right, #F9BF00, #FCD364);
+				.price-all {
+					margin-right: 10rpx;
+					.price-icon {
+						font-size: 20rpx;
+					}
+					.price-txt {
+						font-size: 40rpx;
+					}
+				}
+				.price-old {
+					text-decoration: line-through;
+					color: #eee;
+					font-style: oblique;
+					.price-icon {
+						font-size: 20rpx;
+					}
+					.price-txt {
+						font-size: 24rpx;
+					}
+				}
+			}
+			.msg-right {
+				text-align: center;
+				flex-grow: 1;
+				display: flex;
+				align-items: center;
+				background: #FFE794;
+				color: #d78d00;
+				padding: 14rpx 14rpx 14rpx 30rpx;
+				position: relative;
+				.triangle {
+					width: 0;
+					height: 0;
+					border-top: 40rpx solid transparent;
+					border-right: 40rpx solid #ffe794;
+					border-bottom: 40rpx solid transparent;
+					position: absolute;
+					left: -40rpx;
+					top: 0;
+				}
+				.goods-name {
+					font-size: 30rpx;
+				}
+			}
+		}
+	}
 }
 .search-btn {
 	width: 100rpx;
@@ -418,7 +500,7 @@ export default {
 			}
 		}
 	}
-	
+
 	.input-box {
 		padding: 40rpx 20rpx;
 		display: flex;

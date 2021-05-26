@@ -15,7 +15,7 @@
 			</view> -->
 			<view class="item address">
 				<view class="left">收货人地址</view>
-				<textarea type="text" v-model="form.receiveAddress" placeholder-class="line" placeholder="请输入收货人地址" />
+				<input type="text" v-model="form.receiveAddress" placeholder-class="line" placeholder="请输入收货人地址" />
 			</view>
 			<!-- <view class="site-clipboard">
 				<textarea placeholder-class="line" value="" placeholder="粘贴文本,可自动识别姓名和地址等" />
@@ -42,7 +42,7 @@
 				</view>
 				<view class="right u-m-r-10"><u-switch color="red" v-model="form.isDefault" @change="setDefault" /></view>
 			</view>
-			<view class="u-m-l-10 u-m-r-10 u-m-t-20"><u-button type="primary" @click="saveAddress">提交</u-button></view>
+			<view class="u-m-l-10 u-m-r-10 u-m-t-20"><u-button type="primary" @click="saveAddress" shape="circle">提交</u-button></view>
 		</view>
 		<!-- <u-picker mode="region" ref="uPicker" v-model="show" /> -->
 		<u-top-tips ref="uTips" />

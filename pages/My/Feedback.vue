@@ -5,11 +5,11 @@
 			<u-form-item label="提出人:"><u-input type="text" v-model="form.ideaBy" placeholder="请输入提出人" border></u-input></u-form-item>
 			<u-form-item label="联系电话:"><u-input type="number" v-model="form.ideaTel" placeholder="请输入联系电话" border></u-input></u-form-item>
 			<u-form-item label="问题截图:">
-				<u-upload ref="uUpload" :action="action" :file-list="fileList" max-count="5" @on-error="changeImgErr" @on-success="changeImgSuccess" :header="header"></u-upload>
+				<u-upload ref="uUpload" :action="action" :file-list="fileList" max-count="5" @on-error="changeImgErr" @on-success="changeImgSuccess" :header="header" :show-progress="false"></u-upload>
 			</u-form-item>
 			<u-form-item label="问题详情:"><u-input type="textarea" v-model="form.ideaContent" placeholder="请输入问题内容" border></u-input></u-form-item>
 		</u-form>
-		<view class="btn-box"><u-button type="primary" @click="saveForm">提交反馈</u-button></view>
+		<view class="btn-box"><u-button type="primary" @click="saveForm" shape="circle">提交反馈</u-button></view>
 		<u-top-tips ref='uTips' />
 	</view>
 </template>

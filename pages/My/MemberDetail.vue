@@ -1,8 +1,7 @@
 <template>
 	<view class="shop-detail">
 		<u-form :form="form" label-width="180">
-			<u-form-item label="用户名"><u-input v-model="form.nickName" placeholder="请输入用户名"></u-input></u-form-item>
-			<u-form-item label="头像">
+			<u-form-item label="头像" style="text-align: right;">
 				<!-- <u-upload
 					ref="uUpload"
 					:action="action"
@@ -21,9 +20,10 @@
 					<u-avatar v-if="form.avatarUrl" :src="form.avatarUrl.includes('https') ? form.avatarUrl : `${BASE_URL}/files/${form.avatarUrl}`" size="140" @click="uploadImage" mode="square"></u-avatar>
 					<u-avatar v-else :src="`${form.avatarUrl}`" size="140" @click="uploadImage" mode="square"></u-avatar>
 			</u-form-item>
+			<u-form-item label="用户名"><u-input v-model="form.nickName" placeholder="请输入用户名" input-align="right"></u-input></u-form-item>
 			<!-- <u-form-item label="真实姓名"><u-input v-model="form.realName" placeholder="请输入真实姓名"></u-input></u-form-item> -->
 		</u-form>
-		<view class="save-btn"><u-button type="primary" @click="saveShopDetail()">提交信息</u-button></view>
+		<view class="save-btn"><u-button type="primary" @click="saveShopDetail()" shape="circle">提交信息</u-button></view>
 
 		<u-top-tips ref="uTips" />
 	</view>
@@ -161,7 +161,7 @@ export default {
 .shop-detail {
 	padding: 40rpx;
 	.save-btn {
-		margin-top: 40rpx;
+		margin-top: 140rpx;
 	}
 }
 </style>

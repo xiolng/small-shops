@@ -3,43 +3,50 @@
 		<!-- logo -->
 		<u-image :src="details.shopLogo" width="100%" height="400rpx" border-radius="60" />
 		<view class="shop-box">
-			<view class="shop-title mr-30">
+			<view class="shop-title">
 				<!-- <u-icon name="home" size="36rpx"></u-icon> -->
 				<text class="item-name">{{ details.shopName }}</text>
+				<view class="title-tip">
+					<text class="txt">小店</text>
+				</view>
 			</view>
 		</view>
-		<view class="shop-phone mr-30">
-			<view>
+		<view class="shop-detail">
+			<view class="item-box">
 				<u-icon name="phone" size="30rpx" />
 				<text class="item-name" @click="callPhone(details.shopTel)">{{ details.shopTel }}</text>
 			</view>
-			<view class="shop-time">
+			<view class="item-box">
 				<u-icon name="clock" size="30rpx"></u-icon>
 				<text class="item-name">{{ details.businessHour }}</text>
 			</view>
-		</view>
-		<view class="shop-info mr-30">
-			<u-icon name="tags" size="36rpx"></u-icon>
+			<view class="item-box">
+				<u-icon name="tags" size="36rpx"></u-icon>
 			<text class="item-name">{{ details.businessRange }}</text>
-		</view>
-		<view class="shop-address mr-30">
-			<u-icon name="car" size="36rpx" />
+			</view>
+			<view class="item-box">
+				<u-icon name="car" size="36rpx" />
 			<text class="item-name">{{ details.shopAddress }}</text>
-		</view>
-		<view class="shop-detail mr-30">
-			<u-icon name="info-circle" size="36rpx" />
+			</view>
+			<view class="item-box">
+				<u-icon name="info-circle" size="36rpx" />
 			<text class="item-name">{{ details.shopDetail }}</text>
+			</view>
 		</view>
+		
 		<!-- 热卖 -->
-		<u-sticky><view class="hot-title">热卖商品</view></u-sticky>
 		<view class="hot-box">
 			<view class="hot-content">
 				<view class="hot-item" v-for="(item, index) in shopList" :key="index" @click="goDetail(item)">
 					<view class="hot-img"><u-image :src="BASE_URL + '/files/' + item.productCover" height="300"></u-image></view>
 					<view class="hot-name">{{ item.productName }}</view>
+					<view class="hot-info">{{item.productIntro}}</view>
 					<view class="price-box">
-						<!-- <view class="price-txt">￥{{ item.productPrice }}</view> -->
-						<view class="price-icon"><u-icon name="shopping-cart-fill"></u-icon></view>
+						<u-button
+							type="primary"
+							size="small"
+							:customStyle="{width: '100%'}"
+						>立即抢购</u-button>
 					</view>
 				</view>
 			</view>
@@ -105,6 +112,7 @@ export default {
 
 <style lang="scss">
 .index-box {
+	background: #eee;
 	.mr-30 {
 		margin: 30rpx 20rpx 10rpx;
 	}
@@ -112,54 +120,60 @@ export default {
 		color: $u-type-primary;
 	}
 	.shop-box {
+		height: 80rpx;
 		padding: 10rpx;
 		position: relative;
 		z-index: 9;
-		margin-top: -110rpx;
-		background-color: rgba($color: #000000, $alpha: 0.5);
-		border-radius: 60rpx 60rpx 0 0;
+		box-sizing: border-box;
+		margin-top: -80rpx;
+		background: linear-gradient(to right, #F9BF00, #FCD364);
 	}
 	.shop-title {
+		display: flex;
+		align-items: center;
 		font-size: 40rpx;
 		color: #ffffff;
-	}
-	.shop-phone {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-	.shop-address {
-		display: flex;
-		align-items: center;
-		.u-icon {
-			margin-right: 10rpx;
+		.title-tip{
+			width: 70rpx;
+			height: 30rpx;
+			background: linear-gradient(to right, #85a1bd, #0d1d3e);
+			font-size: 20rpx;
+			text-align: center;
+			border-radius: 6rpx;
+			transform: skewX(-30deg);
+			margin-left: 30rpx;
+			.txt{
+				width: 100%;
+				height: 100%;
+				display: block;
+				transform: skewX(30deg);
+			}
 		}
 	}
-	.shop-info {
+	.shop-detail{
+		padding: 20rpx;
+		background: #fff;
 		display: flex;
-		align-items: center;
-		.u-icon {
-			margin-right: 10rpx;
+		flex-wrap: wrap;
+		.item-box{
+			margin: 0 20rpx 20rpx 0;
 		}
-	}
-	.hot-title {
-		font-size: 40rpx;
-		padding: 40rpx 20rpx 20rpx;
-		background-color: #ffffff;
 	}
 	.hot-box {
 		width: 100%;
 		.hot-content {
 			display: flex;
+			justify-content: space-evenly;
 			flex-wrap: wrap;
-			padding: 0 20rpx;
+			padding: 10rpx;
 			.hot-item {
 				width: calc(50% - 40rpx);
 				background-color: #f9f9f9;
 				// flex-grow: 1;
-				margin: 20rpx;
+				margin: 20rpx auto;
 				box-sizing: border-box;
-				box-shadow: 0 0 13rpx 4rpx rgba($color: #000000, $alpha: 0.1);
+				box-shadow: -2rpx 4rpx 9rpx 2rpx rgba($color: #000000, $alpha: 0.1);
+				border-radius: 10rpx;
 				padding: 20rpx;
 				.hot-img {
 					border-bottom: 1px solid #eee;
@@ -168,13 +182,17 @@ export default {
 					font-size: 32rpx;
 					margin: 10rpx 0;
 				}
+				.hot-info{
+					color: #999;
+					font-size: 24rpx;
+					margin-bottom: 10rpx;
+				}
 				.price-box {
-					display: flex;
-					justify-content: space-between;
-					.price-txt {
-						color: $u-type-error;
-					}
-					.price-icon {
+					.u-btn{
+						width: 100%;
+						font-size: 20rpx;
+						padding-top: 10rpx;
+						padding-bottom: 10rpx;
 					}
 				}
 			}

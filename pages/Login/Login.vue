@@ -1,6 +1,8 @@
 <template>
 	<view class="login-box">
-		<view class="login-title">欢迎登录小店</view>
+		<view class="login-title">
+			您好！<br /> 欢迎登录小店！
+			</view>
 		<u-form :model="form" ref="uForm" label-width="100" label-position="top">
 			<u-form-item label="手机号" prop="phone" left-icon="phone"><u-input v-model="form.phone" placeholder="请输入手机号" /></u-form-item>
 			<u-form-item v-if="ispwd" label="密码" prop="password" left-icon="lock">
@@ -16,6 +18,9 @@
 			<text @click="changeLogin">{{ ispwd ? '验证码登录' : '密码登录' }}</text>
 		</view> -->
 		<u-verification-code seconds="60" ref="uCode" @change="codeChange"></u-verification-code>
+		<!-- 背景图形 -->
+		<view class="big-circle"></view>
+		<view class="small-circle"></view>
 	</view>
 </template>
 
@@ -169,10 +174,40 @@ export default {
 
 <style lang="scss">
 .login-box {
+	height: 100vh;
+	background: #fefefe;
 	padding: 40rpx;
+	box-sizing: border-box;
+	position: relative;
+	overflow: hidden;
+	.u-form{
+		position: relative;
+		z-index: 10;
+		margin-bottom: 100rpx;
+	}
+	.big-circle{
+		width: 50vh;
+		height: 50vh;
+		background: rgba($color: #D99465, $alpha: .1);
+		border-radius: 100%;
+		position: absolute;
+		right: -20vh;
+		top: -10vh;
+		z-index: 0;
+	}
+	.small-circle{
+		width: 350rpx;
+		height: 350rpx;
+		background: rgba($color: #D99465, $alpha: .1);
+		border-radius: 100%;
+		position: absolute;
+		left: -100rpx;
+		bottom: -150rpx;
+		z-index: 0;
+	}
 	.login-title {
 		font-size: 40rpx;
-		margin-bottom: 30rpx;
+		margin: 160rpx 0 30rpx;
 	}
 	.change-login {
 		padding: 20rpx 0;

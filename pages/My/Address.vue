@@ -1,26 +1,29 @@
 <template>
-	<view>
+	<view class="address-main">
 		<scroll-view scroll-y style="width: 100%; height: 100vh;" @scrolltolower="onreachBottom">
 			<view class="item" v-for="(res, index) in siteList" :key="res.id">
 				<view class="top">
 					<view class="name">{{ res.receiveName }}</view>
 					<view class="phone">{{ res.receivePhone }}</view>
-					<view class="tag" v-if="res.isDefault"><text :key="index" :class="{ red: res.isDefault }">默认</text></view>
 				</view>
-				<view class="bottom">
-					{{ res.receiveAddress }}
-					<view class="right">
-						<u-icon name="edit-pen" class="u-m-r-20" :size="40" color="#00aaff" @click="$u.route(`/pages/My/AddSite?id=${res.tenantMemberReceiveId}`)"></u-icon>
-						<u-icon name="trash" :size="40" color="red" @click="delAddress" :index="res.tenantMemberReceiveId"></u-icon>
+				<view class="bottom">{{ res.receiveAddress }}</view>
+				<view class="footer">
+					<view class="left-default">
+						<u-checkbox v-model="res.isDefault" :disabled="!res.isDetault" shape="circle" :active-color="$u.color.primary" :name="res.id">默认收货地址</u-checkbox>
+					</view>
+					<view class="right-icons">
+						<view class="icon-box" @click="$u.route(`/pages/My/AddSite?id=${res.tenantMemberReceiveId}`)">
+							<u-image width="27" height="27" :src="editImg" style="margin-right: 8rpx;" />
+							<text>编辑</text>
+						</view>
+						<view class="icon-box" @click="delAddress" :index="res.tenantMemberReceiveId">
+							<u-image width="27" height="27" :src="deleteImg" style="margin-right: 8rpx;" />
+							<text>删除</text>
+						</view>
 					</view>
 				</view>
 			</view>
-			<view class="addSite" @click="toAddSite">
-				<view class="add">
-					<u-icon name="plus" color="#ffffff" class="icon" :size="30"></u-icon>
-					新建收货地址
-				</view>
-			</view>
+			<view class="addSite" @click="toAddSite"><view class="add">新建收货地址</view></view>
 			<u-loadmore status="nomore" />
 		</scroll-view>
 		<u-top-tips ref="uTips" />
@@ -28,9 +31,13 @@
 </template>
 
 <script>
+import editImg from './image/edit.svg';
+import deleteImg from './image/delete.svg';
 export default {
 	data() {
 		return {
+			editImg,
+			deleteImg,
 			siteList: [],
 			page: {
 				pageNum: 1,
@@ -87,43 +94,59 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.address-main {
+	background: #eee;
+	padding: 20rpx;
+}
 .item {
-	padding: 40rpx 20rpx;
+	background: #fff;
+	padding: 40rpx 20rpx 0;
+	margin-bottom: 20rpx;
+	border-radius: 10rpx;
 	.top {
 		display: flex;
 		font-weight: bold;
 		font-size: 34rpx;
 		.phone {
-			margin-left: 60rpx;
-		}
-		.tag {
-			display: flex;
+			font-size: 30rpx;
 			font-weight: normal;
-			align-items: center;
-			text {
-				display: block;
-				width: 60rpx;
-				height: 34rpx;
-				line-height: 34rpx;
-				color: #ffffff;
-				font-size: 20rpx;
-				border-radius: 6rpx;
-				text-align: center;
-				margin-left: 30rpx;
-				background-color: rgb(49, 145, 253);
-			}
-			.red {
-				background-color: red;
-			}
+			margin-left: 60rpx;
 		}
 	}
 	.bottom {
 		display: flex;
-		margin-top: 20rpx;
+		margin: 20rpx 0;
 		font-size: 28rpx;
 		justify-content: space-between;
 		color: #999999;
+	}
+	.footer {
+		width: 100%;
+		display: flex;
+		border-top: 1px solid #eee;
+		padding: 20rpx;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 24rpx;
+		.left-default {
+			.u-checkbox__icon-wrap--disabled--checked {
+				background-color: #f9c100;
+				border-color: #f9c100;
+			}
+			.u-checkbox__label{
+				font-size: 24rpx;
+			}
+		}
+		.right-icons {
+			display: flex;
+			justify-content: end;
+			.icon-box {
+				display: flex;
+				margin-left: 20rpx;
+				align-items: center;
+			}
+		}
 	}
 }
 .addSite {
@@ -137,6 +160,7 @@ export default {
 	background-color: $u-type-primary;
 	border-radius: 10rpx;
 	font-size: 30rpx;
+	border-radius: 80rpx;
 	.add {
 		display: flex;
 		align-items: center;

@@ -105,7 +105,7 @@ export default {
 					this.searchData.orderStatus = 0;
 					const { data, code, total } = res.data;
 					if (code === '200') {
-						if (!data || data.length <= 0) {
+						if (this.page.pageNum !== 1 && (!data || data.length <= 0)) {
 							this.$refs.uTips.show({
 								title: '已加载全部',
 								type: 'warning'

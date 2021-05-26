@@ -3,15 +3,17 @@
 		<view class="u-search-box"><u-search v-model="page.productName" placeholder="请输入商品名称" disabled @click="$u.route(`/pages/Goods/GoodsSearch`)" /></view>
 		<view class="u-menu-wrap">
 			<scroll-view scroll-y scroll-with-animation class="u-tab-view menu-scroll-view" :scroll-top="scrollTop">
-				<view
-					v-for="(item, index) in classList"
-					:key="index"
-					class="u-tab-item"
-					:class="[current == index ? 'u-tab-item-active' : '']"
-					:data-current="index"
-					@tap.stop="swichMenu(index, item)"
-				>
-					<text class="u-line-2">{{ item.categoryName }}</text>
+				<view class="tab-bg">
+					<view
+						v-for="(item, index) in classList"
+						:key="index"
+						class="u-tab-item"
+						:class="[current == index ? 'u-tab-item-active' : (current + 1) == index ? 'radius-right' : '']"
+						:data-current="index"
+						@tap.stop="swichMenu(index, item)"
+					>
+						<text class="u-line-2">{{ item.categoryName }}</text>
+					</view>
 				</view>
 			</scroll-view>
 			<block v-for="(item, index) in classList" :key="index">
@@ -23,7 +25,7 @@
 							</view>
 							<view class="item-container">
 								<view class="thumb-box" v-for="(item1, index1) in list" :key="index1">
-									<image class="item-menu-image" :src="BASE_URL + '/files/' + item1.productCover" mode="" @click="goDetail(item1)"></image>
+									<u-image class="item-menu-image" width="180" height="180" :src="BASE_URL + '/files/' + item1.productCover" mode="" @click="goDetail(item1)"></u-image>
 									<view class="right-box">
 										<view class="item-menu-name u-line-2" @click="goDetail(item1)">{{ item1.productName }}</view>
 										<view class="item-menu-info u-line-2" @click="goDetail(item1)">{{ item1.productIntro }}</view>
@@ -39,7 +41,7 @@
 											<view v-if="changeCardItem(item1)" class="price-btn">
 												<price-number v-if="changeCardItem(item1)" :price="bindCard(item1)" @getPrice="getPrice($event, item1)"></price-number>
 											</view>
-											<view v-else class="price-btn" @click="addCar(item1)"><image class="btn-s" src="../../static/icon/shopping.png"></image></view>
+											<view v-else class="price-btn" @click="addCar(item1)"><u-image class="btn-s" width="50" height="50" :src="CardImg"></u-image></view>
 										</view>
 									</view>
 								</view>
@@ -60,6 +62,7 @@
 import { BASE_URL } from '../../Api/BASE_API.js';
 import PriceNumber from '@/components/PriceNumber/PriceNumber.vue';
 import CardOrder from '@/components/CardOrder/CardOrder.vue'
+import CardImg from './image/card.svg'
 export default {
 	components: {
 		PriceNumber,
@@ -68,6 +71,7 @@ export default {
 	data() {
 		return {
 			BASE_URL,
+			CardImg,
 			scrollTop: 0, //tab标题的滚动条位置
 			current: 0, // 预设当前项的值
 			menuHeight: 0, // 左边菜单的高度
@@ -291,6 +295,10 @@ export default {
 .u-tab-view {
 	width: 200rpx;
 	height: 100%;
+	background: #f6f6f6;
+	.tab-bg{
+		background: #fff;
+	}
 }
 
 .u-tab-item {
@@ -312,6 +320,9 @@ export default {
 	font-size: 30rpx;
 	font-weight: 600;
 	background: #fff;
+}
+.radius-right{
+	border-radius: 0 30rpx 0 0;
 }
 
 .u-tab-item-active::before {
