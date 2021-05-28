@@ -127,6 +127,7 @@ export default {
 
 <style lang="scss">
 .order-box {
+	background: #eee;
 	.movable-box {
 		width: 100%;
 		height: 100%;
