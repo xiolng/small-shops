@@ -95,6 +95,29 @@ const install = (Vue, vm) => {
 		updateMemberReceive: data => vm.$u.post(`/business/memberReceive/updateMemberReceive`, data),
 		// 提交意见反馈
 		saveSystemIdea: data => vm.$u.post(`/business/systemIdea/saveSystemIdea`, data),
+		
+		
+		
+		// 会员优惠券
+		memberCouponPage: data => vm.$u.post(`/coupon/coupon/memberCouponPage`, data),
+		// 获取优惠券
+		gainCoupon: params => vm.$u.get(`/coupon/coupon/gainCoupon`,
+			params),
+		// 按id查询优惠券
+		getMemberCoupon: params => vm.$u.get(`/coupon/coupon/getMemberCoupon`,
+			params),
+		// 优惠券详情
+		getShopCouponById: params => vm.$u.get(`/coupon/coupon/getShopCouponById`,
+			params),
+		// 店铺优惠券
+		shopCouponList: data => vm.$u.post(`/coupon/coupon/shopCouponList`,
+			data),
+		// 场景列表
+		sceneList: params => vm.$u.get(`/business/scene/sceneList`,
+			params),
+		// 场景业务列表
+		getSceneBusinessByNo: params => vm.$u.get(`/business/scene/getSceneBusinessByNo`,
+			params),
 	}
 }
 export default {

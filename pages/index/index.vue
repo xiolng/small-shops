@@ -6,9 +6,7 @@
 			<view class="shop-title">
 				<!-- <u-icon name="home" size="36rpx"></u-icon> -->
 				<text class="item-name">{{ details.shopName }}</text>
-				<view class="title-tip">
-					<text class="txt">小店</text>
-				</view>
+				<view class="title-tip"><text class="txt">小店</text></view>
 			</view>
 		</view>
 		<view class="shop-detail">
@@ -22,35 +20,71 @@
 			</view>
 			<view class="item-box">
 				<u-icon name="tags" size="36rpx"></u-icon>
-			<text class="item-name">{{ details.businessRange }}</text>
+				<text class="item-name">{{ details.businessRange }}</text>
 			</view>
 			<view class="item-box">
 				<u-icon name="car" size="36rpx" />
-			<text class="item-name">{{ details.shopAddress }}</text>
+				<text class="item-name">{{ details.shopAddress }}</text>
 			</view>
 			<view class="item-box">
 				<u-icon name="info-circle" size="36rpx" />
-			<text class="item-name">{{ details.shopDetail }}</text>
+				<text class="item-name">{{ details.shopDetail }}</text>
 			</view>
 		</view>
-		
+		<!-- 优惠券列表 -->
+		<view class="coupon-box">
+			<view class="coupon-list" v-if="couponData.length" v-for="(list, inx) in couponData" :key="inx">
+				<view class="coupon-item" :class="[item.couponType == 1 ? 'dedu' : '']" v-for="item in list.datas" :key="item.couponId" @click="item.isGain == 0 ? getQuery(item) : ''">
+					<view class="coupon-top">
+						<view class="coupon-name" v-if="item.couponType == 0">{{ item.couponName }} (满 {{ item.fullLimit }}元 - {{ item.deduAmount }}元)</view>
+						<view class="coupon-name" v-else>{{ item.couponName }} (满 {{ item.fullLimit }}元 打 {{ item.deduProp }}折)</view>
+						<view class="coupon-type">{{ item.couponType ? '折扣券' : '满减券' }}</view>
+					</view>
+					<view class="coupon-bot">
+						<view class="left">
+							<view class="dates">有效时间：{{ item.launchStartTime || item.startTime }}-{{ item.launchEndTime || item.endTime }}</view>
+							<view class="used-range">适用范围：{{ item.usedRange ? '指定商品' : '全部商品' }}</view>
+						</view>
+						<view class="right">{{ item.isGain == 0 ? '未领取' : '已领取' }}</view>
+					</view>
+				</view>
+			</view>
+		</view>
 		<!-- 热卖 -->
 		<view class="hot-box">
 			<view class="hot-content">
 				<view class="hot-item" v-for="(item, index) in shopList" :key="index" @click="goDetail(item)">
 					<view class="hot-img"><u-image :src="BASE_URL + '/files/' + item.productCover" height="300"></u-image></view>
 					<view class="hot-name">{{ item.productName }}</view>
-					<view class="hot-info">{{item.productIntro}}</view>
-					<view class="price-box">
-						<u-button
-							type="primary"
-							size="small"
-							:customStyle="{width: '100%'}"
-						>立即抢购</u-button>
-					</view>
+					<view class="hot-info">{{ item.productIntro }}</view>
+					<view class="price-box"><u-button type="primary" size="small" :customStyle="{ width: '100%' }">立即抢购</u-button></view>
 				</view>
 			</view>
 		</view>
+		<u-top-tips ref="uTips" />
+		<u-popup mode="center" v-model="showCoupon" :mask-custom-style="{ background: 'rgba(0,0,0,0.5)' }" class="coupon-pop" width="78%" closeable>
+			<view class="coupon-box" style="margin-top: 62rpx;">
+				<view class="coupon-list" v-if="couponData.length" v-for="(list, inx) in couponData" :key="inx">
+					<view class="coupon-item" :class="[item.couponType == 1 ? 'dedu' : '']" v-for="item in list.datas" :key="item.couponId" @click="item.isGain == 0 ? getQuery(item) : ''">
+						<view class="coupon-top">
+							<view class="coupon-name" v-if="item.couponType == 0">{{ item.couponName }} (满 {{ item.fullLimit }}元 - {{ item.deduAmount }}元)</view>
+							<view class="coupon-name" v-else>{{ item.couponName }} (满 {{ item.fullLimit }}元 打 {{ item.deduProp }}折)</view>
+							<view class="coupon-type">{{ item.couponType ? '折扣券' : '满减券' }}</view>
+						</view>
+						<view class="coupon-bot">
+							<view class="left">
+								<view class="dates">有效时间：{{ item.launchStartTime || item.startTime }}-{{ item.launchEndTime || item.endTime }}</view>
+								<view class="used-range">适用范围：{{ item.usedRange ? '指定商品' : '全部商品' }}</view>
+							</view>
+							<view class="right">
+								{{ item.isGain == 0 ? '未领取' : '已领取' }}
+								<view style="margin-top: 40rpx;" @click="item.isGain == 0 ? getQuery(item) : ''">立即领取</view>
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
+		</u-popup>
 	</view>
 </template>
 
@@ -61,15 +95,73 @@ export default {
 		return {
 			BASE_URL,
 			details: {},
-			shopList: []
+			shopList: [],
+			couponData: [],
+			showCoupon: true
 		};
 	},
 	onLoad() {
+		const vm = this;
 		this.getDetail();
 		this.getHotShop();
 		console.log('sss', this.$u.sys(), this.$u.os());
+		this.$u.api.sceneList().then(res => {
+			console.log('sceneList', res);
+			res.data.data &&
+				res.data.data.map((j, inx) => {
+					vm.$u.api
+						.getSceneBusinessByNo({
+							sceneNo: j.sceneNo
+						})
+						.then(resd => {
+							if (!resd.data.data || !resd.data.data.length) return false;
+							const business = resd.data.data || [];
+							console.log('getScene', resd);
+							vm.$u.api.shopCouponList(JSON.stringify(business.map(b => b.businessId))).then(resde => {
+								console.log('shopCouponList', resde);
+								const sceneList = uni.getStorageSync('sceneList') || [];
+								console.log(123, sceneList);
+								if (sceneList.filter(nos => nos.sceneNo == j.sceneNo).length) return false;
+								sceneList.push({
+									sceneNo: j.sceneNo,
+									busunessId: business.map(bu => bu.businessId),
+									datas: resde.data.data
+								});
+								vm.couponData = sceneList;
+								uni.setStorageSync('3', vm.couponData);
+								uni.setStorageSync('sceneList', sceneList);
+							});
+						});
+				});
+		});
+	},
+	mounted() {
+		this.couponData = uni.getStorageSync('sceneList') || [];
+		console.log(1111, this.couponData);
 	},
 	methods: {
+		getQuery(item) {
+			this.$u.api
+				.gainCoupon({
+					couponId: item.couponId
+				})
+				.then(res => {
+					const { code, data, msg } = res.data;
+					this.showCoupon = false
+					if (code == '200') {
+						this.$refs.uTips.show({
+							type: 'success',
+							title: '领取成功'
+						});
+						item.isGain = !item.isGain;
+					} else {
+						this.$refs.uTips.show({
+							type: 'error',
+							title: msg
+						});
+					}
+				});
+		},
 		getDetail() {
 			this.$u.api.getShop().then(res => {
 				if (res.data.code === '200') {
@@ -126,14 +218,14 @@ export default {
 		z-index: 9;
 		box-sizing: border-box;
 		margin-top: -80rpx;
-		background: linear-gradient(to right, #F9BF00, #FCD364);
+		background: linear-gradient(to right, #f9bf00, #fcd364);
 	}
 	.shop-title {
 		display: flex;
 		align-items: center;
 		font-size: 40rpx;
 		color: #ffffff;
-		.title-tip{
+		.title-tip {
 			width: 70rpx;
 			height: 30rpx;
 			background: linear-gradient(to right, #85a1bd, #0d1d3e);
@@ -142,7 +234,7 @@ export default {
 			border-radius: 6rpx;
 			transform: skewX(-30deg);
 			margin-left: 30rpx;
-			.txt{
+			.txt {
 				width: 100%;
 				height: 100%;
 				display: block;
@@ -150,12 +242,12 @@ export default {
 			}
 		}
 	}
-	.shop-detail{
+	.shop-detail {
 		padding: 20rpx;
 		background: #fff;
 		display: flex;
 		flex-wrap: wrap;
-		.item-box{
+		.item-box {
 			margin: 0 20rpx 20rpx 0;
 		}
 	}
@@ -182,13 +274,13 @@ export default {
 					font-size: 32rpx;
 					margin: 10rpx 0;
 				}
-				.hot-info{
+				.hot-info {
 					color: #999;
 					font-size: 24rpx;
 					margin-bottom: 10rpx;
 				}
 				.price-box {
-					.u-btn{
+					.u-btn {
 						width: 100%;
 						font-size: 20rpx;
 						padding-top: 10rpx;
@@ -197,6 +289,55 @@ export default {
 				}
 			}
 		}
+	}
+	.coupon-box {
+		.coupon-list {
+			padding: 20rpx;
+			.coupon-item {
+				background: #dd524d;
+				border-radius: 20rpx;
+				color: #fff;
+				margin: 0 0 20rpx;
+				padding: 20rpx;
+				&.dedu {
+					background: #f29100;
+				}
+				.coupon-top {
+					border-bottom: 1px solid #fff;
+					padding: 10rpx;
+					display: flex;
+					justify-content: space-between;
+					.coupon-name {
+						font-size: 28rpx;
+					}
+					.coupon-type {
+						font-size: 28rpx;
+					}
+				}
+				.coupon-bot {
+					padding: 10rpx;
+					display: flex;
+					justify-content: space-between;
+					.left {
+						.dates {
+							margin-bottom: 10rpx;
+						}
+						.used-range {
+							font-size: 26rpx;
+						}
+					}
+					.right {
+						flex-shrink: 0;
+						font-size: 30rpx;
+					}
+				}
+			}
+		}
+	}
+}
+.coupon-pop {
+	.u-mode-center-box {
+		background: none;
 	}
 }
 </style>

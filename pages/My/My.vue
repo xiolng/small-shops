@@ -55,6 +55,10 @@
 					<u-image :src="faImg" width="60" height="60"></u-image>
 					<view class="grid-text">问题反馈</view>
 				</u-grid-item>
+				<u-grid-item @click="isLogin() && $u.route(`/pages/My/Feedback`)">
+					<u-icon width="60" height="60" name="coupon"></u-icon>
+					<view class="grid-text">优惠券</view>
+				</u-grid-item>
 			</u-grid>
 		</view>
 		<!-- <view class="u-m-t-20">

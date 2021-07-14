@@ -157,6 +157,15 @@
             }
             
         }
+        ,{
+            "path" : "pages/My/Coupon",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "优惠券",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
