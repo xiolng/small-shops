@@ -1,90 +1,70 @@
 <template>
 	<view class="index-box">
-		<!-- logo -->
-		<u-image :src="details.shopLogo" width="100%" height="400rpx" border-radius="60" />
-		<view class="shop-box">
-			<view class="shop-title">
-				<!-- <u-icon name="home" size="36rpx"></u-icon> -->
-				<text class="item-name">{{ details.shopName }}</text>
-				<view class="title-tip"><text class="txt">小店</text></view>
-			</view>
+		<u-swiper :list="bannerList" :height="390" @click="clickImg" :custom-style="{ background: '#fff' }" />
+		<!-- menu -->
+		<view style="padding: 20rpx; background: #fff;">
+			<u-grid :col="4" :border="false">
+				<u-grid-item
+					v-for="(item, index) in districtList"
+					:key="item.kingDistrictId"
+					bg-color="#fff"
+					:custom-style="{ background: '#fff', width: 'calc(100% - 20rpx)', borderRadius: '10%' }"
+				>
+					<u-image :src="BASE_URL + '/files/' + item.districtIcon" width="54rpx" height="54rpx" />
+					<view class="grid-text" style="color: #999; margin-top: 10rpx;">{{ item.districtName }}</view>
+				</u-grid-item>
+			</u-grid>
 		</view>
-		<view class="shop-detail">
-			<view class="item-box">
-				<u-icon name="phone" size="30rpx" />
-				<text class="item-name" @click="callPhone(details.shopTel)">{{ details.shopTel }}</text>
+
+		<!-- 热销商品 -->
+		<view class="hot-product" :class="inx == 0 && 'red'" v-for="(list, inx) in windowList" :key="list.showWindowId">
+			<view class="product-title">
+				<view class="title-box">
+					<u-avatar :src="BASE_URL + '/files/' + list.showIcon" size="39" />
+					<view class="title">{{ list.showName }}</view>
+				</view>
+				<view class="more-box">
+					<view class="more-txt">更多</view>
+					<u-icon name="arrow-right" />
+				</view>
 			</view>
-			<view class="item-box">
-				<u-icon name="clock" size="30rpx"></u-icon>
-				<text class="item-name">{{ details.businessHour }}</text>
-			</view>
-			<view class="item-box">
-				<u-icon name="tags" size="36rpx"></u-icon>
-				<text class="item-name">{{ details.businessRange }}</text>
-			</view>
-			<view class="item-box">
-				<u-icon name="car" size="36rpx" />
-				<text class="item-name">{{ details.shopAddress }}</text>
-			</view>
-			<view class="item-box">
-				<u-icon name="info-circle" size="36rpx" />
-				<text class="item-name">{{ details.shopDetail }}</text>
-			</view>
-		</view>
-		<!-- 优惠券列表 -->
-		<view class="coupon-box">
-			<view class="coupon-list" v-if="couponData.length" v-for="(list, inx) in couponData" :key="inx">
-				<view class="coupon-item" :class="[item.couponType == 1 ? 'dedu' : '']" v-for="item in list.datas" :key="item.couponId" @click="item.isGain == 0 ? getQuery(item) : ''">
-					<view class="coupon-top">
-						<view class="coupon-name" v-if="item.couponType == 0">{{ item.couponName }} (满 {{ item.fullLimit }}元 - {{ item.deduAmount }}元)</view>
-						<view class="coupon-name" v-else>{{ item.couponName }} (满 {{ item.fullLimit }}元 打 {{ item.deduProp }}折)</view>
-						<view class="coupon-type">{{ item.couponType ? '折扣券' : '满减券' }}</view>
-					</view>
-					<view class="coupon-bot">
-						<view class="left">
-							<view class="dates">有效时间：{{ item.launchStartTime || item.startTime }}-{{ item.launchEndTime || item.endTime }}</view>
-							<view class="used-range">适用范围：{{ item.usedRange ? '指定商品' : '全部商品' }}</view>
+			<view class="product-content">
+				<view class="product-list">
+					<view class="product-item" v-for="(item, index) in list.productList" :key="index" @click="goDetail(item)">
+						<view class="product-img"><u-image :src="BASE_URL + '/files/' + item.productCover" height="243"></u-image></view>
+						<view class="product-name u-line-1">{{ item.productName }}</view>
+						<view class="price-box">
+							<view class="price-item">￥</view>
+							<view class="price-txt u-line-1">{{ item.productPrice }}</view>
 						</view>
-						<view class="right">{{ item.isGain == 0 ? '未领取' : '已领取' }}</view>
 					</view>
 				</view>
 			</view>
 		</view>
 		<!-- 热卖 -->
-		<view class="hot-box">
-			<view class="hot-content">
-				<view class="hot-item" v-for="(item, index) in shopList" :key="index" @click="goDetail(item)">
-					<view class="hot-img"><u-image :src="BASE_URL + '/files/' + item.productCover" height="300"></u-image></view>
-					<view class="hot-name">{{ item.productName }}</view>
-					<view class="hot-info">{{ item.productIntro }}</view>
-					<view class="price-box"><u-button type="primary" size="small" :customStyle="{ width: '100%' }">立即抢购</u-button></view>
-				</view>
+		<view style="padding-top: 10rpx; background: #fff;">
+			<view class="window-title">
+				<u-icon name="heart" style="font-size: 43rpx; color: #DC2626; margin-right: 6rpx;" />
+				<view class="window-name">猜你喜欢</view>
 			</view>
-		</view>
-		<u-top-tips ref="uTips" />
-		<u-popup mode="center" v-model="showCoupon" :mask-custom-style="{ background: 'rgba(0,0,0,0.5)' }" class="coupon-pop" width="78%" closeable>
-			<view class="coupon-box" style="margin-top: 62rpx;">
-				<view class="coupon-list" v-if="couponData.length" v-for="(list, inx) in couponData" :key="inx">
-					<view class="coupon-item" :class="[item.couponType == 1 ? 'dedu' : '']" v-for="item in list.datas" :key="item.couponId" @click="item.isGain == 0 ? getQuery(item) : ''">
-						<view class="coupon-top">
-							<view class="coupon-name" v-if="item.couponType == 0">{{ item.couponName }} (满 {{ item.fullLimit }}元 - {{ item.deduAmount }}元)</view>
-							<view class="coupon-name" v-else>{{ item.couponName }} (满 {{ item.fullLimit }}元 打 {{ item.deduProp }}折)</view>
-							<view class="coupon-type">{{ item.couponType ? '折扣券' : '满减券' }}</view>
+			<view class="hot-box">
+				<view class="hot-content">
+					<view class="hot-item" v-for="(item, index) in shopList" :key="index" @click="goDetail(item)">
+						<view class="left">
+							<view class="hot-img"><u-image :src="BASE_URL + '/files/' + item.productCover" height="191"></u-image></view>
 						</view>
-						<view class="coupon-bot">
-							<view class="left">
-								<view class="dates">有效时间：{{ item.launchStartTime || item.startTime }}-{{ item.launchEndTime || item.endTime }}</view>
-								<view class="used-range">适用范围：{{ item.usedRange ? '指定商品' : '全部商品' }}</view>
-							</view>
-							<view class="right">
-								{{ item.isGain == 0 ? '未领取' : '已领取' }}
-								<view style="margin-top: 40rpx;" @click="item.isGain == 0 ? getQuery(item) : ''">立即领取</view>
+						<view class="right">
+							<view class="hot-name">{{ item.productName }}</view>
+							<view class="hot-info">{{ item.productIntro }}</view>
+							<view class="price-box">
+								<view class="price-item">￥</view>
+							<view class="price-txt">{{ item.productPrice }}</view>
 							</view>
 						</view>
 					</view>
 				</view>
 			</view>
-		</u-popup>
+		</view>
 	</view>
 </template>
 
@@ -94,80 +74,26 @@ export default {
 	data() {
 		return {
 			BASE_URL,
-			details: {},
-			shopList: [],
-			couponData: [],
-			showCoupon: true
+			bannerList: [],
+			districtList: [],
+			windowList: [],
+			shopList: []
 		};
 	},
 	onLoad() {
 		const vm = this;
-		this.getDetail();
-		this.getHotShop();
-		console.log('sss', this.$u.sys(), this.$u.os());
-		this.$u.api.sceneList().then(res => {
-			console.log('sceneList', res);
-			res.data.data &&
-				res.data.data.map((j, inx) => {
-					vm.$u.api
-						.getSceneBusinessByNo({
-							sceneNo: j.sceneNo
-						})
-						.then(resd => {
-							if (!resd.data.data || !resd.data.data.length) return false;
-							const business = resd.data.data || [];
-							console.log('getScene', resd);
-							vm.$u.api.shopCouponList(JSON.stringify(business.map(b => b.businessId))).then(resde => {
-								console.log('shopCouponList', resde);
-								const sceneList = uni.getStorageSync('sceneList') || [];
-								console.log(123, sceneList);
-								if (sceneList.filter(nos => nos.sceneNo == j.sceneNo).length) return false;
-								sceneList.push({
-									sceneNo: j.sceneNo,
-									busunessId: business.map(bu => bu.businessId),
-									datas: resde.data.data
-								});
-								vm.couponData = sceneList;
-								uni.setStorageSync('3', vm.couponData);
-								uni.setStorageSync('sceneList', sceneList);
-							});
-						});
-				});
-		});
 	},
 	mounted() {
-		this.couponData = uni.getStorageSync('sceneList') || [];
-		console.log(1111, this.couponData);
+		this.getHotShop();
+		this.getDistrict();
+		this.getBanner();
+		this.getWindow();
 	},
 	methods: {
-		getQuery(item) {
-			this.$u.api
-				.gainCoupon({
-					couponId: item.couponId
-				})
-				.then(res => {
-					const { code, data, msg } = res.data;
-					this.showCoupon = false
-					if (code == '200') {
-						this.$refs.uTips.show({
-							type: 'success',
-							title: '领取成功'
-						});
-						item.isGain = !item.isGain;
-					} else {
-						this.$refs.uTips.show({
-							type: 'error',
-							title: msg
-						});
-					}
-				});
-		},
-		getDetail() {
-			this.$u.api.getShop().then(res => {
-				if (res.data.code === '200') {
-					this.details = res.data.data;
-					this.details.shopLogo = `${BASE_URL}/files/${res.data.data.shopLogo}`;
-					uni.setStorageSync('shopDetail', this.details);
+		getWindow() {
+			this.$u.api.listShowWindow().then(res => {
+				if (res.data.code == '200') {
+					this.windowList = res.data.data;
 				}
 			});
 		},
@@ -179,9 +105,30 @@ export default {
 				}
 			});
 		},
-		callPhone(phone) {
-			uni.makePhoneCall({
-				phoneNumber: phone
+		getDistrict() {
+			this.$u.api.listKingDistrict().then(res => {
+				if (res.data.code == '200') {
+					this.districtList = res.data.data;
+				}
+			});
+		},
+		getBanner() {
+			this.$u.api.listShopBanner().then(res => {
+				if (res.data.code == '200') {
+					this.bannerList = res.data.data
+						.sort((a, b) => a.sort - b.sort)
+						.map(v => {
+							v.image = BASE_URL + '/files/' + v.bannerImage;
+							v.title = v.bannerName;
+							return v;
+						});
+				}
+			});
+		},
+		clickImg(index) {
+			const item = this.bannerList[index];
+			uni.navigateTo({
+				url: item.bannerUrl
 			});
 		},
 		goDetail(item1) {
@@ -204,140 +151,144 @@ export default {
 
 <style lang="scss">
 .index-box {
-	background: #eee;
+	background: #efefef;
 	.mr-30 {
 		margin: 30rpx 20rpx 10rpx;
 	}
-	.u-icon {
-		color: $u-type-primary;
-	}
-	.shop-box {
-		height: 80rpx;
-		padding: 10rpx;
-		position: relative;
-		z-index: 9;
-		box-sizing: border-box;
-		margin-top: -80rpx;
-		background: linear-gradient(to right, #f9bf00, #fcd364);
-	}
-	.shop-title {
-		display: flex;
-		align-items: center;
-		font-size: 40rpx;
-		color: #ffffff;
-		.title-tip {
-			width: 70rpx;
-			height: 30rpx;
-			background: linear-gradient(to right, #85a1bd, #0d1d3e);
-			font-size: 20rpx;
-			text-align: center;
-			border-radius: 6rpx;
-			transform: skewX(-30deg);
-			margin-left: 30rpx;
-			.txt {
-				width: 100%;
-				height: 100%;
-				display: block;
-				transform: skewX(30deg);
+
+	.hot-product {
+		margin: 0 0 20rpx;
+		background: #fff;
+		&.red {
+			background: linear-gradient(180deg, red, #fff, #fff);
+			.product-title {
+				color: #fff;
+			}
+		}
+
+		.product-title {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10rpx 30rpx;
+			.title-box {
+				display: flex;
+				align-items: center;
+				margin: 20rpx;
+				.title {
+					font-size: 28rpx;
+				}
+			}
+			.more-box {
+				display: flex;
+				align-items: center;
+			}
+		}
+		.product-content {
+			margin: 0 20rpx 20rpx;
+			background: #fff;
+			overflow: hidden;
+			overflow-x: auto;
+			.product-list {
+				padding: 10rpx;
+				display: flex;
+				flex-wrap: nowrap;
+				.product-item {
+					width: 234rpx;
+					flex-grow: 1;
+					flex-shrink: 0;
+					margin: 10rpx;
+					padding: 10rpx;
+					border: 1rpx solid #eee;
+					border-radius: 10rpx;
+					.product-img {
+						width: 100%;
+						margin-bottom: 10rpx;
+					}
+					.product-name {
+						width: 100%;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						word-wrap: normal;
+						white-space: nowrap;
+						margin-bottom: 10rpx;
+					}
+					.price-box {
+						color: #dc2626;
+						display: flex;
+						align-items: center;
+						.price-item {
+							font-size: 24rpx;
+						}
+						.price-txt {
+							font-size: 28rpx;
+						}
+					}
+				}
 			}
 		}
 	}
-	.shop-detail {
-		padding: 20rpx;
+
+	.window-title {
 		background: #fff;
 		display: flex;
-		flex-wrap: wrap;
-		.item-box {
-			margin: 0 20rpx 20rpx 0;
+		margin: 30rpx 0 0;
+		align-items: center;
+		justify-content: center;
+		padding-left: 20rpx;
+		.window-name {
+			font-size: 34rpx;
+			border-bottom: 4rpx solid #DC2626;
 		}
 	}
+	/* 猜你喜欢 */
 	.hot-box {
 		width: 100%;
 		.hot-content {
-			display: flex;
-			justify-content: space-evenly;
-			flex-wrap: wrap;
 			padding: 10rpx;
 			.hot-item {
-				width: calc(50% - 40rpx);
-				background-color: #f9f9f9;
-				// flex-grow: 1;
+				display: flex;
 				margin: 20rpx auto;
 				box-sizing: border-box;
 				box-shadow: -2rpx 4rpx 9rpx 2rpx rgba($color: #000000, $alpha: 0.1);
 				border-radius: 10rpx;
+				border-bottom: 1rpx solid #efefef;
 				padding: 20rpx;
-				.hot-img {
-					border-bottom: 1px solid #eee;
+				.left {
+					width: 100rpx;
+					flex-grow: 1;
+					flex-shrink: 0;
+					.hot-img {
+						border-bottom: 1px solid #eee;
+					}
 				}
-				.hot-name {
-					font-size: 32rpx;
-					margin: 10rpx 0;
-				}
-				.hot-info {
-					color: #999;
-					font-size: 24rpx;
-					margin-bottom: 10rpx;
-				}
-				.price-box {
-					.u-btn {
-						width: 100%;
-						font-size: 20rpx;
-						padding-top: 10rpx;
-						padding-bottom: 10rpx;
+				.right {
+					display: flex;
+					flex-grow: 2;
+					flex-direction: column;
+					justify-content: space-between;
+					.hot-name {
+						font-size: 32rpx;
+						margin: 10rpx 0;
+					}
+					.hot-info {
+						color: #999;
+						font-size: 24rpx;
+						margin-bottom: 10rpx;
+					}
+					.price-box {
+						display: flex;
+						color: #DC2626;
+						.price-item{
+							font-size: 24rpx;
+						}
+						.price-txt{
+							font-size: 28rpx;
+						}
 					}
 				}
 			}
 		}
-	}
-	.coupon-box {
-		.coupon-list {
-			padding: 20rpx;
-			.coupon-item {
-				background: #dd524d;
-				border-radius: 20rpx;
-				color: #fff;
-				margin: 0 0 20rpx;
-				padding: 20rpx;
-				&.dedu {
-					background: #f29100;
-				}
-				.coupon-top {
-					border-bottom: 1px solid #fff;
-					padding: 10rpx;
-					display: flex;
-					justify-content: space-between;
-					.coupon-name {
-						font-size: 28rpx;
-					}
-					.coupon-type {
-						font-size: 28rpx;
-					}
-				}
-				.coupon-bot {
-					padding: 10rpx;
-					display: flex;
-					justify-content: space-between;
-					.left {
-						.dates {
-							margin-bottom: 10rpx;
-						}
-						.used-range {
-							font-size: 26rpx;
-						}
-					}
-					.right {
-						flex-shrink: 0;
-						font-size: 30rpx;
-					}
-				}
-			}
-		}
-	}
-}
-.coupon-pop {
-	.u-mode-center-box {
-		background: none;
 	}
 }
 </style>

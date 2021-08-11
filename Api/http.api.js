@@ -13,6 +13,12 @@ const install = (Vue, vm) => {
 		 ********************************/
 		// 商铺详情
 		getShop: params => vm.$u.get(`/business/shop/getShop`, params),
+		// 橱窗列表
+		listShowWindow: params => vm.$u.get(`/business/showWindow/listShowWindow`, params),
+		// 店铺菜单列表
+		listKingDistrict: params => vm.$u.get(`/business/kingDistrict/listKingDistrict`, params),
+		// banner
+		listShopBanner: params => vm.$u.get(`/business/shopBanner/listShopBanner`, params),
 		/***********************************************
 		 * 商品分类管理
 		 ***********************************************/

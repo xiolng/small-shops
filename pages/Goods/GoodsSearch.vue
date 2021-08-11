@@ -1,44 +1,18 @@
 <template>
 	<view class="goods-search">
-		<view class="u-search-box">
-			<u-search
-				v-model="page.productName"
-				placeholder="请输入商品名称"
-				@search="
-					page.pageNum = 1;
-					getList(page.productCategoryId);
-				"
-				@clear="
-					page.pageNum = 1;
-					getList(page.productCategoryId);
-				"
-				@custom="
-					page.pageNum = 1;
-					getList(page.productCategoryId);
-				"
-				:focus="true"
-			/>
-		</view>
+		<view class="u-search-box"><u-search v-model="searchData" placeholder="请输入商品名称" @search="searchGoods" @custom="searchGoods" :focus="true" /></view>
 
-		<view class="item-container">
-			<view class="thumb-box" v-for="(item1, index1) in list" :key="index1" @click="goDetail(item1)">
-				<image class="item-menu-image" :src="BASE_URL + '/files/' + item1.productCover" mode=""></image>
-				<view class="right-box">
-					<view class="item-menu-name u-line-2">{{ item1.productName }}</view>
-					<view class="item-menu-info u-line-2">{{ item1.productIntro }}</view>
-					<view class="price-box">
-						<view class="price-txt">
-							<view class="price-origin">
-								<text class="red">￥</text>
-								<text class="txt">{{ item1.originalPrice.toFixed(2) }}</text>
-							</view>
-							<text class="red">￥</text>
-							<text class="txt">{{ item1.productPrice.toFixed(2) }}</text>
-						</view>
-						<view class="price-btn"><image class="btn-s" src="../../static/icon/shopping.png"></image></view>
-					</view>
+		<view class="item-container" v-if="list && list.length">
+			<!-- title -->
+			<view class="history-title">
+				<view class="history-left">
+					<u-icon name="clock" size="40" />
+					<text class="history-txt">历史搜索</text>
 				</view>
+				<view class="history-right"><u-icon name="trash-fill" size="40" @click="clearHistory" /></view>
 			</view>
+			<!-- history-list -->
+			<view class="history-list"><u-tag v-for="(item, index) in list" :text="item" :key="index" shape="circle" type="info" style="margin: 0 10rpx 10rpx 0;" @click="goGoods(index)" @close="deleteHistory(index)" closeable /></view>
 		</view>
 	</view>
 </template>
@@ -50,38 +24,38 @@ export default {
 		return {
 			BASE_URL,
 			list: [],
-			classList: [],
-			page: {
-				pageNum: 1,
-				pageSize: 10,
-				total: 0,
-				productName: ''
-			}
+			searchData: ''
 		};
 	},
 	onLoad() {},
-	mounted() {
+	onShow() {
+		const oldData = uni.getStorageSync('historySearch') || [];
+		this.list = oldData;
 	},
 	methods: {
-		getList() {
-			this.$u.api.pageProduct({ ...this.page }).then(res => {
-				const { data, code, total } = res.data;
-				if (code === '200') {
-					this.list = data || [];
-					this.page.total = total;
-				}
+		goGoods(index){
+			uni.navigateTo({
+				url: `/pages/Goods/Goods?searchName=${this.list[index]}`
+			})
+		},
+		searchGoods() {
+			if (!this.searchData) return false;
+			const oldData = uni.getStorageSync('historySearch') || [];
+			oldData.push(this.searchData);
+			uni.setStorageSync('historySearch', oldData);
+			this.searchData = ''
+			uni.navigateTo({
+				url: `/pages/Goods/Goods?seearchName=${this.searchData}`
 			});
 		},
-		goDetail(item1) {
-			this.$u.route({
-				url: `/pages/Goods/GoodsDetail`,
-				params: {
-					id: item1.productId,
-					productType: item1.productType
-				},
-				type: 'redirectTo'
-			});
+		deleteHistory(index){
+			this.list.splice(index, 1)
+			uni.setStorageSync('historySearch', this.list)
 		},
+		clearHistory(){
+			this.list = []
+			uni.setStorageSync('historySearch', [])
+		}
 	}
 };
 </script>
@@ -94,61 +68,23 @@ export default {
 
 	.item-container {
 		padding: 0 40rpx;
-		display: flex;
-		flex-wrap: wrap;
-	}
-
-	.thumb-box {
-		width: 100%;
-		background: #efefef;
-		padding: 10rpx;
-		display: flex;
-		align-items: start;
-		justify-content: space-between;
-		margin-top: 20rpx;
-		.right-box {
-			flex-grow: 2;
+		.history-title {
 			display: flex;
-			flex-direction: column;
+			align-items: center;
 			justify-content: space-between;
-			padding: 10rpx;
-			min-height: 100%;
-			.price-box {
+			margin-bottom: 20rpx;
+			.history-left {
 				display: flex;
-				justify-content: space-between;
 				align-items: center;
-				.price-txt {
-					color: red;
-					.red {
-						font-size: 20rpx;
-					}
-					.txt {
-						font-size: 30rpx;
-					}
-					.price-origin {
-						color: #999;
-						text-decoration: line-through;
-						font-style: oblique;
-						font-size: 18rpx;
-						.txt {
-							font-size: 24rpx;
-						}
-					}
-				}
-				.price-btn {
-					width: 80rpx;
-					height: 80rpx;
-					.btn-s {
-						width: 100%;
-						height: 100%;
-					}
-				}
+			}
+			.history-txt {
+				font-size: 34rpx;
+				margin-left: 4rpx;
 			}
 		}
-		.item-menu-image {
-			width: 180rpx;
-			height: 180rpx;
-			flex-shrink: 0;
+		.history-list {
+			display: flex;
+			flex-wrap: wrap;
 		}
 	}
 }

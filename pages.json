@@ -6,17 +6,16 @@
 			"tkiQrcode": "tki-qrcode/components/tki-qrcode/tki-qrcode.vue"
 		}
 	},
-	"pages": [
-		{
+	"pages": [{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "商铺"
+				"navigationBarTitleText": "首页"
 				// "navigationStyle":"custom"
 			}
-		},{
+		}, {
 			"path": "pages/Goods/Goods",
 			"style": {
-				"navigationBarTitleText": "分类",
+				"navigationBarTitleText": "商品",
 				"enablePullDownRefresh": false
 			}
 
@@ -32,7 +31,7 @@
 			"style": {
 				"navigationBarTitleText": "我的",
 				"enablePullDownRefresh": false,
-				"navigationStyle":"custom"
+				"navigationStyle": "custom"
 			}
 
 		}, {
@@ -40,7 +39,7 @@
 			"style": {
 				"navigationBarTitleText": "登录",
 				"enablePullDownRefresh": false,
-				"navigationStyle":"custom"
+				"navigationStyle": "custom"
 			}
 
 		}, {
@@ -85,18 +84,79 @@
 				"enablePullDownRefresh": false
 			}
 
+		}, {
+			"path": "pages/wxAuth/wxAuth",
+			"style": {
+				"navigationBarTitleText": "微信授权",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/shareWd/shareWd",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/Pay/Pay",
+			"style": {
+				"navigationBarTitleText": "支付订单",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/Pay/CreateOrder",
+			"style": {
+				"navigationBarTitleText": "提交订单",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/Order/OrderDetail",
+			"style": {
+				"navigationBarTitleText": "订单详情",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/StockOrder/StockOrder",
+			"style": {
+				"navigationBarTitleText": "券码列表",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/StockOrder/StockOrderDetail",
+			"style": {
+				"navigationBarTitleText": "券码详情",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/Goods/GoodsSearch",
+			"style": {
+				"navigationBarTitleText": "商品搜索",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/My/Coupon",
+			"style": {
+				"navigationBarTitleText": "优惠券",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/Shop/Shop",
+			"style": {
+				"navigationBarTitleText": "商铺",
+				"enablePullDownRefresh": false
+			}
+
 		}
 	    ,{
-            "path" : "pages/wxAuth/wxAuth",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "微信授权",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/shareWd/shareWd",
+            "path" : "pages/ToIndex/ToIndex",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "",
@@ -105,63 +165,10 @@
             
         }
         ,{
-            "path" : "pages/Pay/Pay",
+            "path" : "pages/Category/Category",
             "style" :                                                                                    
             {
-                "navigationBarTitleText": "支付订单",
-                "enablePullDownRefresh": false
-            }
-            
-        },{
-            "path" : "pages/Pay/CreateOrder",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "提交订单",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/Order/OrderDetail",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "订单详情",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/StockOrder/StockOrder",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "券码列表",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/StockOrder/StockOrderDetail",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "券码详情",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/Goods/GoodsSearch",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "商品搜索",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        ,{
-            "path" : "pages/My/Coupon",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "优惠券",
+                "navigationBarTitleText": "分类",
                 "enablePullDownRefresh": false
             }
             
@@ -176,28 +183,22 @@
 	"tabBar": {
 		"selectedColor": "#FF6600",
 		"list": [{
-				"iconPath": "/static/tabs/shop.png",
-				"selectedIconPath": "/static/tabs/shop.png",
+				"iconPath": "/static/tabs/car.png",
+				"selectedIconPath": "/static/tabs/car.png",
 				"pagePath": "pages/index/index",
 				"text": "首页"
 			},
 			{
 				"iconPath": "/static/tabs/goods.png",
 				"selectedIconPath": "/static/tabs/goods.png",
-				"pagePath": "pages/Goods/Goods",
-				"text": "商品"
+				"pagePath": "pages/Category/Category",
+				"text": "分类"
 			},
-			// {
-			// 	"iconPath": "/static/tabs/car.png",
-			// 	"selectedIconPath": "/static/tabs/car.png",
-			// 	"pagePath": "pages/Card/Card",
-			// 	"text": "购物车"
-			// },
 			{
-				"iconPath": "/static/tabs/order.png",
-				"selectedIconPath": "/static/tabs/order.png",
-				"pagePath": "pages/Order/Order",
-				"text": "订单"
+				"iconPath": "/static/tabs/car.png",
+				"selectedIconPath": "/static/tabs/car.png",
+				"pagePath": "pages/Card/Card",
+				"text": "购物车"
 			},
 			{
 				"iconPath": "/static/tabs/my.png",

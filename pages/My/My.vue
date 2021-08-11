@@ -4,7 +4,11 @@
 			<view class="abs-box">
 				<view class="static-box">
 					<view class="u-m-r-10 abs-item">
-						<u-avatar v-if="memberDetail.avatarUrl" :src="memberDetail.avatarUrl.includes('https') ? memberDetail.avatarUrl : `${BASE_URL}/files/${memberDetail.avatarUrl}`" size="140"></u-avatar>
+						<u-avatar
+							v-if="memberDetail.avatarUrl"
+							:src="memberDetail.avatarUrl.includes('https') ? memberDetail.avatarUrl : `${BASE_URL}/files/${memberDetail.avatarUrl}`"
+							size="140"
+						></u-avatar>
 						<u-avatar v-else :src="`${memberDetail.avatarUrl}`" size="140"></u-avatar>
 					</view>
 					<view class="u-flex-1 abs-item">
@@ -16,9 +20,9 @@
 				</view>
 			</view>
 		</view>
-	
+
 		<view class="tab-box">
-			<view class="tab-title">其他服务</view>
+			<view class="tab-title">我的订单</view>
 			<u-grid :col="4">
 				<u-grid-item
 					@click="
@@ -28,44 +32,40 @@
 							})
 					"
 				>
-					<u-image :src="squImg" width="60" height="60"></u-image>
-					<view class="grid-text">券码</view>
+					<u-icon name="rmb" size="49" color="#ff0000"></u-icon>
+					<view class="grid-text">待付款</view>
 				</u-grid-item>
 				<u-grid-item
 					@click="
 						$u.route({
-								url: `/pages/My/MemberDetail`
+							url: `/pages/My/MemberDetail`
 						})
 					"
 				>
-					<u-image :src="msgImg" width="60" height="60"></u-image>
-					<view class="grid-text">信息编辑</view>
+					<u-icon name="shopping-cart-fill" size="49" color="#ff0000"></u-icon>
+					<view class="grid-text">待发货</view>
 				</u-grid-item>
 				<u-grid-item
 					@click="
 						$u.route({
-								url: `/pages/My/Address`
+							url: `/pages/My/Address`
 						})
 					"
 				>
-					<u-image :src="addressImg" width="60" height="60"></u-image>
-					<view class="grid-text">收货地址</view>
+					<u-icon name="car" size="49" color="#ff0000"></u-icon>
+					<view class="grid-text">待收货</view>
 				</u-grid-item>
 				<u-grid-item @click="isLogin() && $u.route(`/pages/My/Feedback`)">
-					<u-image :src="faImg" width="60" height="60"></u-image>
-					<view class="grid-text">问题反馈</view>
-				</u-grid-item>
-				<u-grid-item @click="isLogin() && $u.route(`/pages/My/Feedback`)">
-					<u-icon width="60" height="60" name="coupon"></u-icon>
-					<view class="grid-text">优惠券</view>
+					<u-icon name="chat" size="49" color="#ff0000"></u-icon>
+					<view class="grid-text">待评价</view>
 				</u-grid-item>
 			</u-grid>
 		</view>
-		<!-- <view class="u-m-t-20">
-			
+		<view class="u-m-20">
 			<u-cell-group>
 				<u-cell-item
 					icon="edit-pen"
+					:icon-style="{color: '#00aa7f'}"
 					title="信息修改"
 					@click="
 						$u.route({
@@ -73,24 +73,55 @@
 						})
 					"
 				></u-cell-item>
+				<u-cell-item
+					icon="red-packet"
+					:icon-style="{color: '#ff00ff'}"
+					title="我的券码"
+					@click="
+						$u.route({
+							url: `/pages/StockOrder/StockOrder`
+						})
+					"
+				></u-cell-item>
+				<u-cell-item
+					icon="coupon"
+					:icon-style="{color: '#ff0000'}"
+					title="我的优惠券"
+					@click="
+						$u.route({
+							url: `/pages/My/Coupon`
+						})
+					"
+				></u-cell-item>
+				<u-cell-item
+					icon="list-dot"
+					:icon-style="{color: '#55aaff'}"
+					title="收货地址"
+					@click="
+						$u.route({
+							url: `/pages/My/Address`
+						})
+					"
+				></u-cell-item>
 			</u-cell-group>
 		</view>
-	
-		<view class="u-m-t-20">
-			<u-cell-group><u-cell-item icon="chat" title="问题反馈" @click="$u.route(`/pages/My/Feedback`)"></u-cell-item></u-cell-group>
-		</view> -->
+
+		<view class="u-m-20">
+			<u-cell-group><u-cell-item icon="chat"
+					:icon-style="{color: '#ffaa7f'}" title="问题反馈" @click="$u.route(`/pages/My/Feedback`)"></u-cell-item></u-cell-group>
+		</view>
 	</view>
 </template>
 
 <script>
 import { BASE_URL } from '../../Api/BASE_API.js';
 import { isLogin } from '../../utils/index.js';
-import store from '../../store/index.js'
-import {mapActions, mapState} from 'vuex'
-import squImg from './image/squ.svg'
-import msgImg from './image/msg.svg'
-import addressImg from './image/address.svg'
-import faImg from './image/fa.svg'
+import store from '../../store/index.js';
+import { mapActions, mapState } from 'vuex';
+import squImg from './image/squ.svg';
+import msgImg from './image/msg.svg';
+import addressImg from './image/address.svg';
+import faImg from './image/fa.svg';
 export default {
 	data() {
 		return {
@@ -114,11 +145,11 @@ export default {
 				const { data, code } = res.data;
 				if (code === '200') {
 					uni.setStorageSync('userInfo', data);
-					this.setUserInfoAction(data)
+					this.setUserInfoAction(data);
 				}
 			});
 		},
-			...mapActions(['setUserInfoAction'])
+		...mapActions(['setUserInfoAction'])
 	}
 };
 </script>
@@ -161,7 +192,6 @@ page {
 			padding: 20rpx;
 		}
 		.grid-text {
-			font-size: 30rpx;
 			margin-top: 20rpx;
 		}
 	}

@@ -41,6 +41,9 @@ export const goLogin = () => {
 								url: '/pages/Login/Login'
 							})
 						}
+						uni.reLaunch({
+							url: `/pages/ToIndex/ToIndex`
+						})
 					} else {
 						uni.showModal({
 							title: '登录错误',
@@ -57,4 +60,37 @@ export const goLogin = () => {
 			}
 		}
 	})
+}
+/**
+ * 菜单平级，组合成树结构
+ * @param data
+ * @returns {[]}
+ */
+export const treeMenu = (data, id) => {
+  console.log(222, id, data)
+  const result = []
+  if (!Array.isArray(data)) {
+    return result
+  }
+  data.forEach(item => {
+    delete item.children
+  })
+  const map = {}
+  data.forEach(item => {
+    map[item[id]] = item
+  })
+  data.forEach(item => {
+    item.key = item[id]
+    item.value = item[id]
+    item.title = item.categoryName
+    item.icon = item.categoryIcon
+    const parentId = map[item.parentId]
+    if (parentId) {
+      (parentId.children || (parentId.children = [])).push(item)
+    } else {
+      result.push(item)
+    }
+  })
+  console.log(result, 111)
+  return result
 }
